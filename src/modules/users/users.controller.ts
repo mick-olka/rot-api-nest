@@ -14,7 +14,7 @@ import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { CreateUserDto } from './dto/create-user.dto'
 import { UpdateUserDto } from './dto/update-user.dto'
 import { UsersService } from './users.service'
-import { User } from './schemas/user.schema'
+import { User } from 'src/schemas/user.schema'
 import { AuthGuard } from '@nestjs/passport'
 
 @ApiBearerAuth()

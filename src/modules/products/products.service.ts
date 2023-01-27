@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
 import mongoose, { Model } from 'mongoose'
 import { CreateProductDto } from './dto/create-product.dto'
-import { Product, ProductDocument } from './schemas/product.schema'
+import { Product, ProductDocument } from '../../schemas/product.schema'
 
 type ProductI = Product & { _id: mongoose.Types.ObjectId }
 
