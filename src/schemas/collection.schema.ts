@@ -10,11 +10,11 @@ export class Collection {
   @Prop(locales)
   name: I_Locales
 
-  @Prop(getMongoRef(Product.name, true))
-  items: Product[]
-
   @Prop({ unique: true })
   url_name: string
+
+  @Prop(getMongoRef(Product.name, true))
+  items: Product[]
 
   @Prop({ default: [], type: [String] })
   keywords: string[]
