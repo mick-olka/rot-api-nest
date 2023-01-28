@@ -7,13 +7,13 @@ export type PhotosDocument = HydratedDocument<Photos>
 @Schema()
 export class Photos {
   @Prop([{ type: String, required: true }])
-  pathArr: string[]
+  path_arr: string[]
 
   @Prop(locales)
-  mainColor: I_Locales
+  main_color: I_Locales
 
   @Prop(locales)
-  pillColor: I_Locales
+  pill_color: I_Locales
 }
 
 export const PhotosSchema = SchemaFactory.createForClass(Photos)

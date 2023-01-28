@@ -27,7 +27,7 @@ export class Product {
   price: number
 
   @Prop({ required: false })
-  oldPrice: number
+  old_price: number
 
   @Prop({ required: false })
   thumbnail: string

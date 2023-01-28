@@ -18,7 +18,9 @@ export class ProductsService {
   }
 
   async findOne(id: string): Promise<ProductI> {
-    return this.ProductModel.findOne({ _id: id }).exec()
+    return await this.ProductModel.findOne({ _id: id })
+      .populate('photos')
+      .exec()
   }
 
   async create(data: CreateProductDto): Promise<ProductI> {
@@ -30,6 +32,7 @@ export class ProductsService {
     const updatedItem = await this.ProductModel.findOneAndUpdate(
       { _id: id },
       data,
+      { new: true },
     )
     return updatedItem
   }

@@ -6,6 +6,11 @@ import { Collection, CollectionDocument } from '../../schemas/collection.schema'
 
 type CollectionI = Collection & { _id: mongoose.Types.ObjectId }
 
+const populateProducts = {
+  path: 'items',
+  select: '_id name url_name price old_price thumbnail index',
+}
+
 @Injectable()
 export class CollectionsService {
   constructor(
@@ -18,7 +23,9 @@ export class CollectionsService {
   }
 
   async findOne(id: string): Promise<CollectionI> {
-    return this.CollectionModel.findOne({ _id: id }).populate('items').exec()
+    return this.CollectionModel.findOne({ _id: id })
+      .populate(populateProducts)
+      .exec()
   }
 
   async create(data: CreateCollectionDto): Promise<CollectionI> {
@@ -30,6 +37,7 @@ export class CollectionsService {
     const updatedItem = await this.CollectionModel.findOneAndUpdate(
       { _id: id },
       data,
+      { new: true },
     )
     return updatedItem
   }

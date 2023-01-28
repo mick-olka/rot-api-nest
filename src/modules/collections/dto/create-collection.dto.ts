@@ -8,7 +8,7 @@ const notRequired = {
 }
 
 export class CreateCollectionDto {
-  @ApiProperty({ required: false, default: default_locales })
+  @ApiProperty({ default: default_locales })
   readonly name: I_Locales
 
   @ApiProperty(notRequired)
