@@ -14,7 +14,7 @@ export class Collection {
   url_name: string
 
   @Prop(getMongoRef(Product.name, true))
-  items: Product[]
+  items: string[]
 
   @Prop({ default: [], type: [String] })
   keywords: string[]

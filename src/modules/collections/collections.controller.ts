@@ -52,7 +52,7 @@ export class CollectionsController {
     return this.collectionsService.create(data)
   }
 
-  @Patch()
+  @Patch(':id')
   @HttpCode(HttpStatus.OK)
   @ApiResponse({
     status: HttpStatus.OK,

@@ -13,11 +13,6 @@ export class ProductsService {
     private readonly ProductModel: Model<ProductDocument>,
   ) {}
 
-  async create(data: CreateProductDto): Promise<ProductI> {
-    const createdProduct = await this.ProductModel.create(data)
-    return createdProduct
-  }
-
   async findAll(): Promise<ProductI[]> {
     return this.ProductModel.find().exec()
   }
@@ -26,8 +21,17 @@ export class ProductsService {
     return this.ProductModel.findOne({ _id: id }).exec()
   }
 
+  async create(data: CreateProductDto): Promise<ProductI> {
+    const createdProduct = await this.ProductModel.create(data)
+    return createdProduct
+  }
+
   async update(id: string, data: CreateProductDto): Promise<ProductI> {
-    return this.ProductModel.findOneAndUpdate({ _id: id }, data)
+    const updatedItem = await this.ProductModel.findOneAndUpdate(
+      { _id: id },
+      data,
+    )
+    return updatedItem
   }
 
   async delete(id: string): Promise<ProductI> {

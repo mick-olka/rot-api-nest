@@ -13,27 +13,31 @@ export class CollectionsService {
     private readonly CollectionModel: Model<CollectionDocument>,
   ) {}
 
-  async create(data: CreateCollectionDto): Promise<CollectionI> {
-    const createdProduct = await this.CollectionModel.create(data)
-    return createdProduct
-  }
-
   async findAll(): Promise<CollectionI[]> {
     return this.CollectionModel.find().exec()
   }
 
   async findOne(id: string): Promise<CollectionI> {
-    return this.CollectionModel.findOne({ _id: id }).exec()
+    return this.CollectionModel.findOne({ _id: id }).populate('items').exec()
+  }
+
+  async create(data: CreateCollectionDto): Promise<CollectionI> {
+    const createdItem = await this.CollectionModel.create(data)
+    return createdItem
   }
 
   async update(id: string, data: CreateCollectionDto): Promise<CollectionI> {
-    return this.CollectionModel.findOneAndUpdate({ _id: id }, data)
+    const updatedItem = await this.CollectionModel.findOneAndUpdate(
+      { _id: id },
+      data,
+    )
+    return updatedItem
   }
 
   async delete(id: string): Promise<CollectionI> {
-    const deletedProduct = await this.CollectionModel.findByIdAndRemove({
+    const deletedItem = await this.CollectionModel.findByIdAndRemove({
       _id: id,
     }).exec()
-    return deletedProduct
+    return deletedItem
   }
 }

@@ -52,7 +52,7 @@ export class ProductsController {
     return this.productsService.create(data)
   }
 
-  @Patch()
+  @Patch(':id')
   @HttpCode(HttpStatus.OK)
   @ApiResponse({
     status: HttpStatus.OK,
