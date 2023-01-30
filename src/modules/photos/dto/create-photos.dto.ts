@@ -4,9 +4,7 @@ import { default_locales, I_Locales } from 'src/schemas/data'
 
 export class CreatePhotosDto {
   readonly main_color: I_Locales
-
   readonly pill_color: I_Locales
-
   readonly path_arr: string[]
 }
 

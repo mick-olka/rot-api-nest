@@ -8,6 +8,7 @@ import { AuthModule } from './modules/auth/auth.module'
 import { UsersModule } from './modules/users/users.module'
 import { CollectionsModule } from './modules/collections/collections.module'
 import { PhotosModule } from './modules/photos/photos.module'
+import { TextBlocksModule } from './modules/text_blocks/textBlocks.module'
 import { MulterModule } from '@nestjs/platform-express'
 import { ServeStaticModule } from '@nestjs/serve-static'
 import { join } from 'path'
@@ -29,6 +30,7 @@ import { join } from 'path'
     PhotosModule,
     AuthModule,
     UsersModule,
+    TextBlocksModule,
   ],
   controllers: [AppController],
   providers: [AppService],
