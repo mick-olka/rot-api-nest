@@ -5,8 +5,8 @@ import { I_Locales } from './data'
 export type PhotosDocument = HydratedDocument<Photos>
 
 export const localesNotRequired = raw({
-  ua: { type: String, required: true },
-  en: { type: String, required: true },
+  ua: { type: String, required: false },
+  en: { type: String, required: false },
 })
 
 @Schema()

@@ -11,15 +11,24 @@ import {
   UseInterceptors,
   UploadedFiles,
   ParseFilePipe,
-  MaxFileSizeValidator,
-  FileTypeValidator,
+  Res,
 } from '@nestjs/common'
 import { ApiBody, ApiConsumes, ApiResponse, ApiTags } from '@nestjs/swagger'
-import { CreatePhotosDto } from './dto/create-photos.dto'
-import { UpdatePhotosDto } from './dto/update-photos.dto'
+import { CreatePhotoMultipartDto } from './dto/create-photos.dto'
+import { UpdatePhotoMultipartDto } from './dto/update-photos.dto'
 import { PhotosService } from './photos.service'
 import { Photos } from 'src/schemas/photos.schema'
 import { FilesInterceptor } from '@nestjs/platform-express'
+import { diskStorage } from 'multer'
+import { Response } from 'express'
+import { extname } from 'path'
+
+function getRandomFileName() {
+  const timestamp = new Date().toISOString().replace(/[-:.]/g, '')
+  const random = ('' + Math.random()).substring(2, 8)
+  const random_number = timestamp + random
+  return random_number
+}
 
 @ApiTags('Photos')
 @Controller('photos')
@@ -47,6 +56,16 @@ export class PhotosController {
     return this.photosService.findOne(id)
   }
 
+  // http://localhost:4000/photos/file/20230130T140642201Z443397.png
+  @Get('file/:fileId')
+  @HttpCode(HttpStatus.OK)
+  async serveAvatar(
+    @Param('fileId') fileId: string,
+    @Res() res: Response,
+  ): Promise<any> {
+    res.sendFile(fileId, { root: 'upload' })
+  }
+
   @Post()
   @HttpCode(HttpStatus.CREATED)
   @ApiResponse({
@@ -54,19 +73,33 @@ export class PhotosController {
     description: 'Successfully created collection.',
   })
   @ApiConsumes('multipart/form-data')
-  @UseInterceptors(FilesInterceptor('files'))
+  @UseInterceptors(
+    FilesInterceptor('files', 20, {
+      storage: diskStorage({
+        destination: 'upload',
+        filename: (req, file, cb) => {
+          return cb(null, `${getRandomFileName()}${extname(file.originalname)}`)
+        },
+      }),
+    }),
+  )
   //   @ApiResponse({ status: HttpStatus.FORBIDDEN, description: 'Forbidden.' })
   async create(
-    @Body() data: CreatePhotosDto,
+    @Body() data: CreatePhotoMultipartDto,
     @UploadedFiles(new ParseFilePipe({ validators: [] }))
     files: Array<Express.Multer.File>,
   ) {
-    const photos_data: Partial<Photos> = {}
+    const photos_data = {
+      main_color: undefined,
+      pill_color: undefined,
+      path_arr: [],
+    }
     Object.entries(data).forEach(([key, value]) => {
       photos_data[key] = JSON.parse(value)
     })
     photos_data.path_arr = files.map((f) => f.path)
-    return this.photosService.create(data)
+    console.log(photos_data)
+    return this.photosService.create(photos_data)
   }
 
   @Patch(':id')
@@ -76,19 +109,29 @@ export class PhotosController {
     description: 'Successfully updated photos.',
   })
   @ApiConsumes('multipart/form-data')
+  @UseInterceptors(
+    FilesInterceptor('files', 20, {
+      storage: diskStorage({
+        destination: 'upload',
+        filename: (req, file, cb) => {
+          return cb(null, `${getRandomFileName()}${extname(file.originalname)}`)
+        },
+      }),
+    }),
+  )
   //   @ApiResponse({ status: HttpStatus.FORBIDDEN, description: 'Forbidden.' })
   async update(
     @Param('id') id: string,
-    @Body() data: UpdatePhotosDto,
+    @Body() data: UpdatePhotoMultipartDto,
     @UploadedFiles(new ParseFilePipe({ validators: [] }))
     files: Array<Express.Multer.File>,
   ) {
-    const photos_data: Partial<Photos> = {}
+    const photos_data: Photos = undefined
     Object.entries(data).forEach(([key, value]) => {
       photos_data[key] = JSON.parse(value)
     })
-    if (data.files) photos_data.path_arr = files.map((f) => f.path)
-    return this.photosService.update(id, data)
+    photos_data.path_arr = files.map((f) => f.path)
+    return this.photosService.update(id, photos_data)
   }
 
   @Delete(':id')

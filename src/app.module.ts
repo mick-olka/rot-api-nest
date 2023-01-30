@@ -9,6 +9,8 @@ import { UsersModule } from './modules/users/users.module'
 import { CollectionsModule } from './modules/collections/collections.module'
 import { PhotosModule } from './modules/photos/photos.module'
 import { MulterModule } from '@nestjs/platform-express'
+import { ServeStaticModule } from '@nestjs/serve-static'
+import { join } from 'path'
 
 @Module({
   imports: [
@@ -16,6 +18,11 @@ import { MulterModule } from '@nestjs/platform-express'
     MongooseModule.forRoot(process.env.DATABASE_URL),
     MulterModule.register({
       dest: './upload',
+    }),
+    ServeStaticModule.forRoot({
+      // http://localhost:4000/upload/20230130T140642201Z443397.png
+      rootPath: join(__dirname, '..', 'upload'), // added ../ to get one folder back
+      serveRoot: '/upload/', //last slash was important
     }),
     ProductsModule,
     CollectionsModule,
