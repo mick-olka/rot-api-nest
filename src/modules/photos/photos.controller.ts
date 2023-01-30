@@ -13,22 +13,13 @@ import {
   ParseFilePipe,
   Res,
 } from '@nestjs/common'
-import { ApiBody, ApiConsumes, ApiResponse, ApiTags } from '@nestjs/swagger'
+import { ApiConsumes, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { CreatePhotoMultipartDto } from './dto/create-photos.dto'
 import { UpdatePhotoMultipartDto } from './dto/update-photos.dto'
 import { PhotosService } from './photos.service'
 import { Photos } from 'src/schemas/photos.schema'
-import { FilesInterceptor } from '@nestjs/platform-express'
-import { diskStorage } from 'multer'
 import { Response } from 'express'
-import { extname } from 'path'
-
-function getRandomFileName() {
-  const timestamp = new Date().toISOString().replace(/[-:.]/g, '')
-  const random = ('' + Math.random()).substring(2, 8)
-  const random_number = timestamp + random
-  return random_number
-}
+import { filesInterceptor } from 'src/utils/utils'
 
 @ApiTags('Photos')
 @Controller('photos')
@@ -51,7 +42,6 @@ export class PhotosController {
     status: HttpStatus.OK,
     description: 'Successfully fetched collection.',
   })
-  //   @ApiResponse({ status: HttpStatus.FORBIDDEN, description: 'Forbidden.' })
   getTodoById(@Param('id') id: string): Promise<Photos> {
     return this.photosService.findOne(id)
   }
@@ -73,17 +63,7 @@ export class PhotosController {
     description: 'Successfully created collection.',
   })
   @ApiConsumes('multipart/form-data')
-  @UseInterceptors(
-    FilesInterceptor('files', 20, {
-      storage: diskStorage({
-        destination: 'upload',
-        filename: (req, file, cb) => {
-          return cb(null, `${getRandomFileName()}${extname(file.originalname)}`)
-        },
-      }),
-    }),
-  )
-  //   @ApiResponse({ status: HttpStatus.FORBIDDEN, description: 'Forbidden.' })
+  @UseInterceptors(filesInterceptor)
   async create(
     @Body() data: CreatePhotoMultipartDto,
     @UploadedFiles(new ParseFilePipe({ validators: [] }))
@@ -109,17 +89,7 @@ export class PhotosController {
     description: 'Successfully updated photos.',
   })
   @ApiConsumes('multipart/form-data')
-  @UseInterceptors(
-    FilesInterceptor('files', 20, {
-      storage: diskStorage({
-        destination: 'upload',
-        filename: (req, file, cb) => {
-          return cb(null, `${getRandomFileName()}${extname(file.originalname)}`)
-        },
-      }),
-    }),
-  )
-  //   @ApiResponse({ status: HttpStatus.FORBIDDEN, description: 'Forbidden.' })
+  @UseInterceptors(filesInterceptor)
   async update(
     @Param('id') id: string,
     @Body() data: UpdatePhotoMultipartDto,
