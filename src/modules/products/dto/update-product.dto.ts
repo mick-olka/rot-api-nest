@@ -9,21 +9,21 @@ const notRequired = {
 
 export class UpdateProductDto {
   @ApiProperty({ required: false, default: default_locales })
-  readonly name: I_Locales
+  readonly name?: I_Locales
 
   @ApiProperty(notRequired)
   @IsString()
-  readonly url_name: string
+  readonly url_name?: string
 
   @ApiProperty(notRequired)
   @IsNotEmpty()
   @IsString()
-  readonly code: string
+  readonly code?: string
 
   @ApiProperty()
   @IsNotEmpty()
   @IsNumber()
-  readonly price: number
+  readonly price?: number
 
   @ApiProperty(notRequired)
   @IsNumber()

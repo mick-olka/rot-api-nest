@@ -1,7 +1,8 @@
+import mongoose, { Model } from 'mongoose'
 import { Injectable } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
-import mongoose, { Model } from 'mongoose'
 import { CreatePhotosDto } from './dto/create-photos.dto'
+import { UpdatePhotosDto } from './dto/update-photos.dto'
 import {
   Photos as PhotosSchema,
   PhotosDocument,
@@ -29,7 +30,7 @@ export class PhotosService {
     return createdItem
   }
 
-  async update(id: string, data: CreatePhotosDto): Promise<PhotosI> {
+  async update(id: string, data: UpdatePhotosDto): Promise<PhotosI> {
     const updatedItem = await this.PhotosModel.findOneAndUpdate(
       { _id: id },
       data,

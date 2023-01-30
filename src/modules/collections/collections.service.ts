@@ -3,6 +3,7 @@ import { InjectModel } from '@nestjs/mongoose'
 import mongoose, { Model } from 'mongoose'
 import { CreateCollectionDto } from './dto/create-collection.dto'
 import { Collection, CollectionDocument } from '../../schemas/collection.schema'
+import { UpdateCollectionDto } from './dto/update-collection.dto'
 
 type CollectionI = Collection & { _id: mongoose.Types.ObjectId }
 
@@ -33,7 +34,7 @@ export class CollectionsService {
     return createdItem
   }
 
-  async update(id: string, data: CreateCollectionDto): Promise<CollectionI> {
+  async update(id: string, data: UpdateCollectionDto): Promise<CollectionI> {
     const updatedItem = await this.CollectionModel.findOneAndUpdate(
       { _id: id },
       data,

@@ -1,18 +1,23 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
+import { Prop, raw, Schema, SchemaFactory } from '@nestjs/mongoose'
 import { HydratedDocument } from 'mongoose'
-import { I_Locales, locales } from './data'
+import { I_Locales } from './data'
 
 export type PhotosDocument = HydratedDocument<Photos>
+
+export const localesNotRequired = raw({
+  ua: { type: String, required: true },
+  en: { type: String, required: true },
+})
 
 @Schema()
 export class Photos {
   @Prop([{ type: String, required: true }])
   path_arr: string[]
 
-  @Prop(locales)
+  @Prop(localesNotRequired)
   main_color: I_Locales
 
-  @Prop(locales)
+  @Prop(localesNotRequired)
   pill_color: I_Locales
 }
 

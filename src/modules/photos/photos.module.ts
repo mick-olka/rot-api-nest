@@ -2,13 +2,11 @@ import { Module } from '@nestjs/common'
 import { PhotosController } from './photos.controller'
 import { PhotosService } from './photos.service'
 import { MongooseModule } from '@nestjs/mongoose'
-import { Collection, CollectionSchema } from '../../schemas/collection.schema'
+import { Photos, PhotosSchema } from '../../schemas/photos.schema'
 
 @Module({
   imports: [
-    MongooseModule.forFeature([
-      { name: Collection.name, schema: CollectionSchema },
-    ]),
+    MongooseModule.forFeature([{ name: Photos.name, schema: PhotosSchema }]),
   ],
   controllers: [PhotosController],
   providers: [PhotosService],
