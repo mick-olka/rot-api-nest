@@ -2,15 +2,13 @@ import { ApiProperty } from '@nestjs/swagger'
 import { IsNotEmpty, IsString, IsNumber } from 'class-validator'
 import { default_locales, I_Locales, I_ProductFeatures } from 'src/schemas/data'
 import { Product } from 'src/schemas/product.schema'
+import { File } from 'src/utils/interfaces'
 
 const notRequired = {
   required: false,
 }
 
-export class UpdateProductDto {
-  @ApiProperty({ required: false, default: default_locales })
-  readonly name?: I_Locales
-
+class ProductDto {
   @ApiProperty(notRequired)
   @IsString()
   readonly url_name?: string
@@ -29,8 +27,6 @@ export class UpdateProductDto {
   @IsNumber()
   readonly old_price?: number
 
-  readonly thumbnail?: string
-
   readonly keywords?: string[]
 
   @ApiProperty({ required: false, default: default_locales })
@@ -47,4 +43,22 @@ export class UpdateProductDto {
   @ApiProperty(notRequired)
   @IsNumber()
   readonly index?: number
+}
+
+export class UpdateProductMultipartDto extends ProductDto {
+  @ApiProperty({ default: default_locales })
+  @IsString()
+  readonly name: string
+
+  @ApiProperty({
+    type: 'string',
+    format: 'binary',
+    required: false,
+  })
+  readonly thumbnail?: File
+}
+
+export class UpdateProductDto extends ProductDto {
+  readonly name?: I_Locales
+  readonly thumbnail?: string
 }

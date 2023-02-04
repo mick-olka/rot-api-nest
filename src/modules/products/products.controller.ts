@@ -1,3 +1,4 @@
+import { I_Locales } from 'src/schemas/data'
 import {
   Controller,
   Get,
@@ -8,12 +9,15 @@ import {
   Param,
   Delete,
   Patch,
+  UseInterceptors,
+  UploadedFile,
 } from '@nestjs/common'
-import { ApiResponse, ApiTags } from '@nestjs/swagger'
-import { CreateProductDto } from './dto/create-product.dto'
-import { UpdateProductDto } from './dto/update-product.dto'
+import { ApiConsumes, ApiResponse, ApiTags } from '@nestjs/swagger'
+import { CreateProductMultipartDto } from './dto/create-product.dto'
+import { UpdateProductMultipartDto } from './dto/update-product.dto'
 import { ProductsService } from './products.service'
 import { Product } from 'src/schemas/product.schema'
+import { preparePhotos, thumbnailInterceptor } from 'src/utils/utils'
 
 @ApiTags('Products')
 @Controller('products')
@@ -43,24 +47,45 @@ export class ProductsController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
+  @ApiConsumes('multipart/form-data')
+  @UseInterceptors(thumbnailInterceptor)
   @ApiResponse({
     status: HttpStatus.CREATED,
     description: 'Successfully created product.',
   })
-  //   @ApiResponse({ status: HttpStatus.FORBIDDEN, description: 'Forbidden.' })
-  async create(@Body() data: CreateProductDto) {
-    return this.productsService.create(data)
+  async create(
+    @Body() data: CreateProductMultipartDto,
+    @UploadedFile() thumbnail: Express.Multer.File,
+  ) {
+    const product_data: any = { ...data }
+    product_data.name = JSON.parse(data.name)
+    if (thumbnail) {
+      preparePhotos([thumbnail], 640)
+      product_data.thumbnail = thumbnail.path
+    }
+    return this.productsService.create(product_data)
   }
 
   @Patch(':id')
   @HttpCode(HttpStatus.OK)
+  @ApiConsumes('multipart/form-data')
+  @UseInterceptors(thumbnailInterceptor)
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Successfully updated product.',
   })
-  //   @ApiResponse({ status: HttpStatus.FORBIDDEN, description: 'Forbidden.' })
-  async update(@Param('id') id: string, @Body() data: UpdateProductDto) {
-    return this.productsService.update(id, data)
+  async update(
+    @Param('id') id: string,
+    @Body() data: UpdateProductMultipartDto,
+    @UploadedFile() thumbnail: Express.Multer.File,
+  ) {
+    const product_data: any = { ...data }
+    product_data.name = JSON.parse(data.name)
+    if (thumbnail) {
+      preparePhotos([thumbnail], 640)
+      product_data.thumbnail = thumbnail.path
+    }
+    return this.productsService.update(id, product_data)
   }
 
   @Delete(':id')

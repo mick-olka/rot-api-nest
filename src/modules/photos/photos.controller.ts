@@ -19,7 +19,7 @@ import { UpdatePhotoMultipartDto } from './dto/update-photos.dto'
 import { PhotosService } from './photos.service'
 import { Photos } from 'src/schemas/photos.schema'
 import { Response } from 'express'
-import { filesInterceptor } from 'src/utils/utils'
+import { photosInterceptor, preparePhotos } from 'src/utils/utils'
 
 @ApiTags('Photos')
 @Controller('photos')
@@ -63,7 +63,7 @@ export class PhotosController {
     description: 'Successfully created collection.',
   })
   @ApiConsumes('multipart/form-data')
-  @UseInterceptors(filesInterceptor)
+  @UseInterceptors(photosInterceptor)
   async create(
     @Body() data: CreatePhotoMultipartDto,
     @UploadedFiles(new ParseFilePipe({ validators: [] }))
@@ -77,8 +77,8 @@ export class PhotosController {
     Object.entries(data).forEach(([key, value]) => {
       photos_data[key] = JSON.parse(value)
     })
+    preparePhotos(files, 1200)
     photos_data.path_arr = files.map((f) => f.path)
-    console.log(photos_data)
     return this.photosService.create(photos_data)
   }
 
@@ -89,7 +89,7 @@ export class PhotosController {
     description: 'Successfully updated photos.',
   })
   @ApiConsumes('multipart/form-data')
-  @UseInterceptors(filesInterceptor)
+  @UseInterceptors(photosInterceptor)
   async update(
     @Param('id') id: string,
     @Body() data: UpdatePhotoMultipartDto,

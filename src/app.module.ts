@@ -22,8 +22,8 @@ import { join } from 'path'
     }),
     ServeStaticModule.forRoot({
       // http://localhost:4000/upload/20230130T140642201Z443397.png
-      rootPath: join(__dirname, '..', 'upload'), // added ../ to get one folder back
-      serveRoot: '/upload/', //last slash was important
+      rootPath: join(__dirname, '..', 'upload'),
+      serveRoot: '/upload/', //last slash is important
     }),
     ProductsModule,
     CollectionsModule,

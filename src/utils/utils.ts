@@ -1,6 +1,7 @@
-import { FilesInterceptor } from '@nestjs/platform-express'
+import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express'
 import { diskStorage } from 'multer'
-import { extname } from 'path'
+import { extname, join } from 'path'
+import jimp from 'jimp'
 
 export const getRandomFileName = () => {
   const timestamp = new Date().toISOString().replace(/[-:.]/g, '')
@@ -9,7 +10,7 @@ export const getRandomFileName = () => {
   return random_number
 }
 
-export const filesInterceptor = FilesInterceptor('files', 20, {
+export const photosInterceptor = FilesInterceptor('files', 20, {
   storage: diskStorage({
     destination: 'upload',
     filename: (req, file, cb) => {
@@ -17,3 +18,42 @@ export const filesInterceptor = FilesInterceptor('files', 20, {
     },
   }),
 })
+
+export const thumbnailInterceptor = FileInterceptor('thumbnail', {
+  storage: diskStorage({
+    destination: 'upload',
+    filename: (req, file, cb) => {
+      return cb(null, `${getRandomFileName()}${extname(file.originalname)}`)
+    },
+  }),
+})
+
+let watermark
+// find watermark
+jimp
+  .read(join(__dirname, '..', '..', 'resources', 'watermark1.png'))
+  .then((image) => {
+    watermark = image
+  })
+
+export const preparePhotos = (
+  files: Array<Express.Multer.File>,
+  max_size: number,
+) => {
+  for (let i = 0; i < files.length; i++) {
+    jimp.read(files[i].path, (err, img) => {
+      if (err) throw err
+      else {
+        img
+          .scaleToFit(max_size, max_size) // resize
+          .quality(72) // set JPEG quality
+        const w = img.getWidth(),
+          h = img.getHeight()
+        watermark.scaleToFit(w - 100, 500)
+        img
+          .composite(watermark, 50, h / 2 - 145) // set watermark
+          .write(files[i].path) // save
+      }
+    })
+  }
+}
