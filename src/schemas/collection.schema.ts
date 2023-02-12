@@ -5,6 +5,16 @@ import { Product } from './product.schema'
 
 export type CollectionDocument = HydratedDocument<Collection>
 
+interface I_ProductPopulated {
+  _id: string
+  name: I_Locales
+  url_name: string
+  price: number
+  old_price: number
+  thumbnail: string
+  index: number
+}
+
 @Schema()
 export class Collection {
   @Prop(locales)
@@ -14,7 +24,7 @@ export class Collection {
   url_name: string
 
   @Prop(getMongoRef(Product.name, true))
-  items: string[]
+  items: I_ProductPopulated[]
 
   @Prop({ default: [], type: [String] })
   keywords: string[]

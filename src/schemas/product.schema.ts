@@ -42,7 +42,7 @@ export class Product {
   features: I_ProductFeatures
 
   @Prop(getMongoRef(Photos.name, true))
-  photos: string[]
+  photos: Photos[]
 
   @Prop(getMongoRef(Product.name, true))
   related_products: Product[]
