@@ -1,5 +1,6 @@
 import { raw } from '@nestjs/mongoose'
 import mongoose from 'mongoose'
+import { Product } from './product.schema'
 
 export const getMongoRef = (name: string, isArray?: boolean) => {
   if (isArray)
@@ -67,3 +68,17 @@ export const productFeatures = raw({
 })
 
 // ==================================
+
+export interface I_OrderItem {
+  product: string
+  count: number
+  main_color: string
+  pill_color: string
+}
+
+export enum StatusEnum {
+  c = 'cancelled',
+  d = 'done',
+  w = 'waiting',
+  p = 'in progress',
+}

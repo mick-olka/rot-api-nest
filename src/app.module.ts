@@ -12,6 +12,7 @@ import { TextBlocksModule } from './modules/text_blocks/textBlocks.module'
 import { MulterModule } from '@nestjs/platform-express'
 import { ServeStaticModule } from '@nestjs/serve-static'
 import { join } from 'path'
+import { OrdersModule } from './modules/orders/orders.module'
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { join } from 'path'
     AuthModule,
     UsersModule,
     TextBlocksModule,
+    OrdersModule,
   ],
   controllers: [AppController],
   providers: [AppService],
