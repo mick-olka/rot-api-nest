@@ -1,5 +1,4 @@
 import { raw } from '@nestjs/mongoose'
-import { I_OrderItem } from 'src/schemas/data'
 
 export const orderItem = raw([
   {
@@ -10,9 +9,16 @@ export const orderItem = raw([
   },
 ])
 
-export const default_cart_item: I_OrderItem = {
+export const default_cart_item: I_OrderItemDto = {
   count: 1,
   product: 'product_id',
   main_color: 'white',
   pill_color: 'cream',
+}
+
+export interface I_OrderItemDto {
+  product: string
+  count: number
+  main_color: string
+  pill_color: string
 }

@@ -4,12 +4,17 @@ import mongoose, { Model } from 'mongoose'
 import { CreateOrderDto } from './dto/create-order.dto'
 import { UpdateOrderDto } from './dto/update-order.dto'
 import { Order, OrderDocument } from 'src/schemas/order.schema'
+import { Product } from 'src/schemas/product.schema'
 
 type OrderI = Order & { _id: mongoose.Types.ObjectId }
 
 const populateProducts = {
   path: 'cart',
-  select: '_id name url_name price thumbnail index',
+  populate: {
+    path: 'product',
+    model: Product.name,
+    select: '_id name url_name price thumbnail index',
+  },
 }
 
 @Injectable()

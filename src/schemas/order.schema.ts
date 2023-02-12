@@ -1,6 +1,6 @@
 import { Prop, raw, Schema, SchemaFactory } from '@nestjs/mongoose'
 import { HydratedDocument } from 'mongoose'
-import { locales, I_OrderItem, StatusEnum, getMongoRef } from './data'
+import { StatusEnum, getMongoRef, I_Locales } from './data'
 import { Product } from './product.schema'
 
 export type OrderDocument = HydratedDocument<Order>
@@ -18,15 +18,31 @@ const orderItem = raw({
   pill_color: { type: String, default: '' },
 })
 
+interface I_ProductPopulated {
+  _id: string
+  name: I_Locales
+  url_name: string
+  price: number
+  thumbnail: string
+  index: number
+}
+
+export interface I_OrderItem {
+  product: I_ProductPopulated
+  count: number
+  main_color: string
+  pill_color: string
+}
+
 @Schema()
 export class Order {
-  @Prop(locales)
+  @Prop(String)
   name: string
 
-  @Prop(locales)
+  @Prop(String)
   phone: string
 
-  @Prop(locales)
+  @Prop(String)
   message: string
 
   @Prop(Number)

@@ -1,16 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger'
-import {
-  IsString,
-  IsNumber,
-  IsPhoneNumber,
-  IsDateString,
-} from 'class-validator'
-import { I_Locales, I_OrderItem, StatusEnum } from 'src/schemas/data'
-import { default_cart_item, orderItem } from './data'
+import { IsString, IsNumber, IsPhoneNumber } from 'class-validator'
+import { I_Locales, StatusEnum } from 'src/schemas/data'
+import { default_cart_item, I_OrderItemDto, orderItem } from './data'
 
-const notRequired = {
-  required: false,
-}
+const notRequired = { required: false }
 
 export class UpdateOrderDto {
   @ApiProperty(notRequired)
@@ -32,15 +25,11 @@ export class UpdateOrderDto {
   @ApiProperty({ enum: StatusEnum, required: false })
   readonly status?: string
 
-  @ApiProperty(notRequired)
-  @IsDateString()
-  readonly date?: string
-
   @ApiProperty({
     type: orderItem,
     required: false,
     isArray: true,
     default: [default_cart_item],
   })
-  readonly cart?: I_OrderItem[]
+  readonly cart?: I_OrderItemDto[]
 }

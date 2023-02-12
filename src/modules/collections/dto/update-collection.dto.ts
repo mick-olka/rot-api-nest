@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { IsNotEmpty, IsString, IsNumber } from 'class-validator'
-import { default_locales, I_Locales, I_ProductFeatures } from 'src/schemas/data'
+import { IsString, IsNumber } from 'class-validator'
+import { default_locales, I_Locales } from 'src/schemas/data'
 import { Product } from 'src/schemas/product.schema'
 
 const notRequired = {

@@ -69,13 +69,6 @@ export const productFeatures = raw({
 
 // ==================================
 
-export interface I_OrderItem {
-  product: string
-  count: number
-  main_color: string
-  pill_color: string
-}
-
 export enum StatusEnum {
   c = 'cancelled',
   d = 'done',
