@@ -12,11 +12,6 @@ class ProductDto {
   @ApiProperty()
   @IsNotEmpty()
   @IsString()
-  readonly url_name: string
-
-  @ApiProperty()
-  @IsNotEmpty()
-  @IsString()
   readonly code: string
 
   @ApiProperty()
@@ -27,6 +22,10 @@ class ProductDto {
   @ApiProperty(notRequired)
   @IsNumber()
   readonly old_price?: number
+
+  @ApiProperty(notRequired)
+  @IsString()
+  readonly url_name?: string
 
   readonly keywords?: string[]
 

@@ -4,6 +4,7 @@ import mongoose, { Model } from 'mongoose'
 import { CreateProductDto } from './dto/create-product.dto'
 import { Product, ProductDocument } from '../../schemas/product.schema'
 import { UpdateProductDto } from './dto/update-product.dto'
+import { PaginationQuery, PromisePaginationResT } from 'src/utils/interfaces'
 
 type ProductI = Product & { _id: mongoose.Types.ObjectId }
 
@@ -14,8 +15,15 @@ export class ProductsService {
     private readonly ProductModel: Model<ProductDocument>,
   ) {}
 
-  async findAll(): Promise<ProductI[]> {
-    return this.ProductModel.find().exec()
+  async findAll({
+    page = 1,
+    limit = 20,
+  }: PaginationQuery): PromisePaginationResT<ProductI> {
+    const count = await this.ProductModel.count()
+    const items = await this.ProductModel.find()
+      .skip((page - 1) * limit)
+      .limit(limit)
+    return { count, docs: items }
   }
 
   async findOne(id: string): Promise<ProductI> {

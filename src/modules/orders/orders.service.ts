@@ -5,6 +5,7 @@ import { CreateOrderDto } from './dto/create-order.dto'
 import { UpdateOrderDto } from './dto/update-order.dto'
 import { Order, OrderDocument } from 'src/schemas/order.schema'
 import { Product } from 'src/schemas/product.schema'
+import { PaginationQuery, PromisePaginationResT } from 'src/utils/interfaces'
 
 type OrderI = Order & { _id: mongoose.Types.ObjectId }
 
@@ -24,8 +25,15 @@ export class OrdersService {
     private readonly OrderModel: Model<OrderDocument>,
   ) {}
 
-  async findAll(): Promise<OrderI[]> {
-    return this.OrderModel.find().exec()
+  async findAll({
+    page = 1,
+    limit = 20,
+  }: PaginationQuery): PromisePaginationResT<OrderI> {
+    const count = await this.OrderModel.count()
+    const items = await this.OrderModel.find()
+      .skip((page - 1) * limit)
+      .limit(limit)
+    return { count, docs: items }
   }
 
   async findOne(id: string): Promise<OrderI> {

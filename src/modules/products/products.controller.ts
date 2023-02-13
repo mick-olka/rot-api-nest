@@ -1,4 +1,3 @@
-import { I_Locales } from 'src/schemas/data'
 import {
   Controller,
   Get,
@@ -11,6 +10,7 @@ import {
   Patch,
   UseInterceptors,
   UploadedFile,
+  Query,
 } from '@nestjs/common'
 import { ApiConsumes, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { CreateProductMultipartDto } from './dto/create-product.dto'
@@ -18,6 +18,11 @@ import { UpdateProductMultipartDto } from './dto/update-product.dto'
 import { ProductsService } from './products.service'
 import { Product } from 'src/schemas/product.schema'
 import { preparePhotos, thumbnailInterceptor } from 'src/utils/utils'
+import cyrillicToTranslit from 'cyrillic-to-translit-js'
+import { PaginationQuery, PromisePaginationResT } from 'src/utils/interfaces'
+import mongoose from 'mongoose'
+
+type ProductI = Product & { _id: mongoose.Types.ObjectId }
 
 @ApiTags('Products')
 @Controller('products')
@@ -30,8 +35,10 @@ export class ProductsController {
     status: HttpStatus.OK,
     description: 'Successfully fetched products.',
   })
-  async findAll(): Promise<Product[]> {
-    return this.productsService.findAll()
+  async findAll(
+    @Query() query: PaginationQuery,
+  ): PromisePaginationResT<ProductI> {
+    return this.productsService.findAll(query)
   }
 
   @Get(':id')
@@ -41,7 +48,7 @@ export class ProductsController {
     description: 'Successfully fetched product.',
   })
   //   @ApiResponse({ status: HttpStatus.FORBIDDEN, description: 'Forbidden.' })
-  getTodoById(@Param('id') id: string): Promise<Product> {
+  getTodoById(@Param('id') id: string): Promise<ProductI> {
     return this.productsService.findOne(id)
   }
 
@@ -56,12 +63,17 @@ export class ProductsController {
   async create(
     @Body() data: CreateProductMultipartDto,
     @UploadedFile() thumbnail: Express.Multer.File,
-  ) {
+  ): Promise<ProductI> {
     const product_data: any = { ...data }
     product_data.name = JSON.parse(data.name)
     if (thumbnail) {
       preparePhotos([thumbnail], 640)
       product_data.thumbnail = thumbnail.path
+    }
+    if (!product_data.url_name) {
+      product_data.url_name = cyrillicToTranslit()
+        .transform(product_data.name.ua, '_')
+        .toLowerCase()
     }
     return this.productsService.create(product_data)
   }
@@ -78,7 +90,7 @@ export class ProductsController {
     @Param('id') id: string,
     @Body() data: UpdateProductMultipartDto,
     @UploadedFile() thumbnail: Express.Multer.File,
-  ) {
+  ): Promise<ProductI> {
     const product_data: any = { ...data }
     product_data.name = JSON.parse(data.name)
     if (thumbnail) {
@@ -94,7 +106,7 @@ export class ProductsController {
     status: HttpStatus.OK,
     description: 'Successfully deleted product.',
   })
-  async delete(@Param('id') id: string) {
+  async delete(@Param('id') id: string): Promise<ProductI> {
     return this.productsService.delete(id)
   }
 }
