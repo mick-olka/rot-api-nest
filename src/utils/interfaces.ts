@@ -15,14 +15,19 @@ export class PaginationQuery {
     required: false,
   })
   @IsNumber()
-  page: number
+  page?: number
 
   @ApiProperty({
     default: 5,
     required: false,
   })
   @IsNumber()
-  limit: number
+  limit?: number
+
+  @ApiProperty({
+    required: false,
+  })
+  regex?: string
 }
 
 export interface I_PaginationRes<T> {

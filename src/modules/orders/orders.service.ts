@@ -6,6 +6,7 @@ import { UpdateOrderDto } from './dto/update-order.dto'
 import { Order, OrderDocument } from 'src/schemas/order.schema'
 import { Product } from 'src/schemas/product.schema'
 import { PaginationQuery, PromisePaginationResT } from 'src/utils/interfaces'
+import { getFilterForSearch } from 'src/utils/utils'
 
 type OrderI = Order & { _id: mongoose.Types.ObjectId }
 
@@ -28,9 +29,13 @@ export class OrdersService {
   async findAll({
     page = 1,
     limit = 20,
+    regex,
   }: PaginationQuery): PromisePaginationResT<OrderI> {
     const count = await this.OrderModel.count()
-    const items = await this.OrderModel.find()
+    const items = await this.OrderModel.find(
+      getFilterForSearch(regex, ['name', 'phone']),
+    )
+      .sort({ date: -1 })
       .skip((page - 1) * limit)
       .limit(limit)
     return { count, docs: items }
@@ -43,7 +48,8 @@ export class OrdersService {
   }
 
   async create(data: CreateOrderDto): Promise<OrderI> {
-    const createdItem = await this.OrderModel.create(data)
+    const order_data = { ...data, date: new Date() }
+    const createdItem = await this.OrderModel.create(order_data)
     return createdItem
   }
 

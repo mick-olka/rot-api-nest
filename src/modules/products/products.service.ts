@@ -5,6 +5,7 @@ import { CreateProductDto } from './dto/create-product.dto'
 import { Product, ProductDocument } from '../../schemas/product.schema'
 import { UpdateProductDto } from './dto/update-product.dto'
 import { PaginationQuery, PromisePaginationResT } from 'src/utils/interfaces'
+import { getFilterForSearch } from 'src/utils/utils'
 
 type ProductI = Product & { _id: mongoose.Types.ObjectId }
 
@@ -18,9 +19,12 @@ export class ProductsService {
   async findAll({
     page = 1,
     limit = 20,
+    regex,
   }: PaginationQuery): PromisePaginationResT<ProductI> {
     const count = await this.ProductModel.count()
-    const items = await this.ProductModel.find()
+    const items = await this.ProductModel.find(
+      getFilterForSearch(regex, ['code', 'name.ua', 'name.en']),
+    )
       .skip((page - 1) * limit)
       .limit(limit)
     return { count, docs: items }

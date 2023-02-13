@@ -57,3 +57,17 @@ export const preparePhotos = (
     })
   }
 }
+
+export const getFilterForSearch = (
+  search_string: string | undefined,
+  fields: string[],
+): any => {
+  let filter: any = {}
+  if (search_string) {
+    const search_words = search_string.split(' ').join('|')
+    const regex = new RegExp(search_words, 'i') // i for case insensitive
+    const regex_fields = fields.map((f) => ({ [f]: { $regex: regex } }))
+    filter = { $or: regex_fields }
+  }
+  return filter
+}

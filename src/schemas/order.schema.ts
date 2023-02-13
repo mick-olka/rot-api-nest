@@ -51,7 +51,7 @@ export class Order {
   @Prop(status)
   status: StatusEnum
 
-  @Prop({ type: Date, default: Date() })
+  @Prop({ type: Date, default: new Date() })
   date: string
 
   @Prop(orderItem)
