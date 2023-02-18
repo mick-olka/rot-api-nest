@@ -3,11 +3,12 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger'
 import { AppModule } from './app.module'
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, {
-    cors: {
-      origin: 'http://localhost:4000',
-      credentials: true,
-    },
+  const app = await NestFactory.create(AppModule)
+  app.enableCors({
+    // origin: 'http://localhost:5173',
+    origin: '*',
+    methods: '*',
+    allowedHeaders: '*',
   })
   const config = new DocumentBuilder()
     .setTitle('Template')
