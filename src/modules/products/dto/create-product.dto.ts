@@ -44,6 +44,7 @@ class ProductDto {
   readonly index?: number
 }
 
+// for swagger
 export class CreateProductMultipartDto extends ProductDto {
   @ApiProperty({ default: default_locales })
   @IsString()
@@ -57,6 +58,7 @@ export class CreateProductMultipartDto extends ProductDto {
   readonly thumbnail?: File
 }
 
+// for internal use
 export class CreateProductDto extends ProductDto {
   readonly name: I_Locales
   readonly thumbnail?: string

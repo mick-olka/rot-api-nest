@@ -5,9 +5,10 @@ import { JwtService } from '@nestjs/jwt'
 
 import * as bcrypt from 'bcrypt'
 
-import { SignUpDto } from './dto'
+import { SignInDto, SignUpDto } from './dto'
 import { Tokens } from './models'
 import { UsersService } from '../users/users.service'
+import { constants } from 'src/utils/constants'
 
 @Injectable()
 export class AuthService {
@@ -18,6 +19,9 @@ export class AuthService {
   ) {}
 
   async signUpLocal(dto: SignUpDto): Promise<Tokens> {
+    if (dto.admin_key !== constants.ADMIN_KEY)
+      throw new ForbiddenException('Access denied')
+
     const hash = await this.hashData(dto.password)
 
     const newUser = await this.userService.create({
@@ -30,7 +34,7 @@ export class AuthService {
     return tokens
   }
 
-  async signInLocal(dto: SignUpDto): Promise<Tokens> {
+  async signInLocal(dto: SignInDto): Promise<Tokens> {
     const user = await this.userService.findOne({
       email: dto.email,
     })

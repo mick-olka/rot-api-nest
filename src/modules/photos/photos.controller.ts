@@ -12,15 +12,23 @@ import {
   UploadedFiles,
   ParseFilePipe,
   Res,
+  UseGuards,
 } from '@nestjs/common'
-import { ApiConsumes, ApiResponse, ApiTags } from '@nestjs/swagger'
+import {
+  ApiBearerAuth,
+  ApiConsumes,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger'
 import { CreatePhotoMultipartDto } from './dto/create-photos.dto'
 import { UpdatePhotoMultipartDto } from './dto/update-photos.dto'
 import { PhotosService } from './photos.service'
 import { Photos } from 'src/schemas/photos.schema'
 import { Response } from 'express'
 import { photosInterceptor, preparePhotos } from 'src/utils/utils'
+import { AuthGuard } from '@nestjs/passport'
 
+@ApiBearerAuth()
 @ApiTags('Photos')
 @Controller('photos')
 export class PhotosController {
@@ -57,6 +65,7 @@ export class PhotosController {
   }
 
   @Post()
+  @UseGuards(AuthGuard('jwt'))
   @HttpCode(HttpStatus.CREATED)
   @ApiResponse({
     status: HttpStatus.CREATED,
@@ -83,6 +92,7 @@ export class PhotosController {
   }
 
   @Patch(':id')
+  @UseGuards(AuthGuard('jwt'))
   @HttpCode(HttpStatus.OK)
   @ApiResponse({
     status: HttpStatus.OK,
@@ -105,6 +115,7 @@ export class PhotosController {
   }
 
   @Delete(':id')
+  @UseGuards(AuthGuard('jwt'))
   @HttpCode(HttpStatus.OK)
   @ApiResponse({
     status: HttpStatus.OK,

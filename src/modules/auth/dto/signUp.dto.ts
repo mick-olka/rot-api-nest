@@ -13,6 +13,10 @@ export class SignUpDto {
     description: 'New password',
   })
   @IsNotEmpty()
-  @IsString()
   password: string
+
+  @ApiProperty({
+    description: 'Admin Key',
+  })
+  admin_key: string
 }

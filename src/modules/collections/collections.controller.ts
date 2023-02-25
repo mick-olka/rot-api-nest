@@ -8,13 +8,16 @@ import {
   Param,
   Delete,
   Patch,
+  UseGuards,
 } from '@nestjs/common'
-import { ApiResponse, ApiTags } from '@nestjs/swagger'
+import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { CreateCollectionDto } from './dto/create-collection.dto'
 import { UpdateCollectionDto } from './dto/update-collection.dto'
 import { CollectionsService } from './collections.service'
 import { Collection } from 'src/schemas/collection.schema'
+import { AuthGuard } from '@nestjs/passport'
 
+@ApiBearerAuth()
 @ApiTags('Collections')
 @Controller('collections')
 export class CollectionsController {
@@ -42,33 +45,37 @@ export class CollectionsController {
   }
 
   @Post()
+  @UseGuards(AuthGuard('jwt'))
   @HttpCode(HttpStatus.CREATED)
   @ApiResponse({
     status: HttpStatus.CREATED,
     description: 'Successfully created collection.',
   })
-  //   @ApiResponse({ status: HttpStatus.FORBIDDEN, description: 'Forbidden.' })
+  @ApiResponse({ status: HttpStatus.FORBIDDEN, description: 'Forbidden.' })
   async create(@Body() data: CreateCollectionDto) {
     return this.collectionsService.create(data)
   }
 
   @Patch(':id')
+  @UseGuards(AuthGuard('jwt'))
   @HttpCode(HttpStatus.OK)
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Successfully updated collection.',
   })
-  //   @ApiResponse({ status: HttpStatus.FORBIDDEN, description: 'Forbidden.' })
+  @ApiResponse({ status: HttpStatus.FORBIDDEN, description: 'Forbidden.' })
   async update(@Param('id') id: string, @Body() data: UpdateCollectionDto) {
     return this.collectionsService.update(id, data)
   }
 
   @Delete(':id')
+  @UseGuards(AuthGuard('jwt'))
   @HttpCode(HttpStatus.OK)
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Successfully deleted collection.',
   })
+  @ApiResponse({ status: HttpStatus.FORBIDDEN, description: 'Forbidden.' })
   async delete(@Param('id') id: string) {
     return this.collectionsService.delete(id)
   }

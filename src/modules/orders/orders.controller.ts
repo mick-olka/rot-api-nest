@@ -9,17 +9,21 @@ import {
   Delete,
   Patch,
   Query,
+  UseGuards,
 } from '@nestjs/common'
-import { ApiResponse, ApiTags } from '@nestjs/swagger'
+import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { CreateOrderDto } from './dto/create-order.dto'
 import { UpdateOrderDto } from './dto/update-order.dto'
 import { OrdersService } from './orders.service'
 import { Order } from 'src/schemas/order.schema'
 import { PaginationQuery, PromisePaginationResT } from 'src/utils/interfaces'
 import mongoose from 'mongoose'
+import { AuthGuard } from '@nestjs/passport'
 
 type OrderI = Order & { _id: mongoose.Types.ObjectId }
 
+@ApiBearerAuth()
+@UseGuards(AuthGuard('jwt'))
 @ApiTags('Orders')
 @Controller('orders')
 export class OrdersController {

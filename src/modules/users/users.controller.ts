@@ -40,7 +40,7 @@ export class UsersController {
     status: HttpStatus.OK,
     description: 'Successfully fetched users.',
   })
-  //   @ApiResponse({ status: HttpStatus.FORBIDDEN, description: 'Forbidden.' })
+  @ApiResponse({ status: HttpStatus.FORBIDDEN, description: 'Forbidden.' })
   findById(@Param('id') id: string): Promise<User> {
     return this.usersService.findById(id)
   }
@@ -51,7 +51,7 @@ export class UsersController {
     status: HttpStatus.CREATED,
     description: 'Successfully created user.',
   })
-  //   @ApiResponse({ status: HttpStatus.FORBIDDEN, description: 'Forbidden.' })
+  @ApiResponse({ status: HttpStatus.FORBIDDEN, description: 'Forbidden.' })
   async create(@Body() data: CreateUserDto) {
     return this.usersService.create(data)
   }
@@ -62,7 +62,7 @@ export class UsersController {
     status: HttpStatus.OK,
     description: 'Successfully updated user.',
   })
-  //   @ApiResponse({ status: HttpStatus.FORBIDDEN, description: 'Forbidden.' })
+  @ApiResponse({ status: HttpStatus.FORBIDDEN, description: 'Forbidden.' })
   async update(@Param('id') id: string, @Body() data: UpdateUserDto) {
     return this.usersService.updateOneById(id, data)
   }
@@ -73,6 +73,7 @@ export class UsersController {
     status: HttpStatus.OK,
     description: 'Successfully deleted user.',
   })
+  @ApiResponse({ status: HttpStatus.FORBIDDEN, description: 'Forbidden.' })
   async delete(@Param('id') id: string) {
     return this.usersService.delete(id)
   }

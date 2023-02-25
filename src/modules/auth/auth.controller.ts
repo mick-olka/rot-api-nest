@@ -13,7 +13,7 @@ import { Tokens } from './models'
 export class AuthController {
   constructor(private authService: AuthService) {}
 
-  @Post('local/register')
+  @Post('register')
   @HttpCode(HttpStatus.CREATED)
   @ApiResponse({
     status: HttpStatus.CREATED,
@@ -25,7 +25,7 @@ export class AuthController {
     return this.authService.signUpLocal(dto)
   }
 
-  @Post('local/login')
+  @Post('login')
   @HttpCode(HttpStatus.OK)
   @ApiResponse({
     status: HttpStatus.CREATED,
