@@ -9,6 +9,7 @@ import {
   default_features,
   getMongoRef,
 } from './data'
+import { ApiProperty } from '@nestjs/swagger'
 
 export type ProductDocument = HydratedDocument<Product>
 
@@ -41,6 +42,7 @@ export class Product {
   @Prop({ type: productFeatures, default: default_features })
   features: I_ProductFeatures
 
+  @ApiProperty({ type: [String] })
   @Prop(getMongoRef(Photos.name, true))
   photos: Photos[]
 

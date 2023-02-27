@@ -9,6 +9,7 @@ import {
   Delete,
   Patch,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common'
 import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { CreateCollectionDto } from './dto/create-collection.dto'
@@ -16,10 +17,12 @@ import { UpdateCollectionDto } from './dto/update-collection.dto'
 import { CollectionsService } from './collections.service'
 import { Collection } from 'src/schemas/collection.schema'
 import { AuthGuard } from '@nestjs/passport'
+import { NotFoundInterceptor } from 'src/utils/injectables'
 
 @ApiBearerAuth()
 @ApiTags('Collections')
 @Controller('collections')
+@UseInterceptors(NotFoundInterceptor)
 export class CollectionsController {
   constructor(private readonly collectionsService: CollectionsService) {}
 

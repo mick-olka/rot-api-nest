@@ -5,9 +5,11 @@ import { CreateProductDto } from './dto/create-product.dto'
 import { Product, ProductDocument } from '../../schemas/product.schema'
 import { UpdateProductDto } from './dto/update-product.dto'
 import { PaginationQuery, PromisePaginationResT } from 'src/utils/interfaces'
-import { getFilterForSearch } from 'src/utils/utils'
+import { getFilterForSearch, getUrlNameFilter } from 'src/utils/utils'
 
 type ProductI = Product & { _id: mongoose.Types.ObjectId }
+
+const populateProductsSelector = '_id name url_name thumbnail price old_price'
 
 @Injectable()
 export class ProductsService {
@@ -21,18 +23,19 @@ export class ProductsService {
     limit = 20,
     regex,
   }: PaginationQuery): PromisePaginationResT<ProductI> {
-    const count = await this.ProductModel.count()
-    const items = await this.ProductModel.find(
-      getFilterForSearch(regex, ['code', 'name.ua', 'name.en']),
-    )
+    const filter = getFilterForSearch(regex, ['code', 'name.ua', 'name.en'])
+    const count = await this.ProductModel.count(filter)
+    const items = await this.ProductModel.find(filter)
       .skip((page - 1) * limit)
       .limit(limit)
     return { count, docs: items }
   }
 
   async findOne(id: string): Promise<ProductI> {
-    return await this.ProductModel.findOne({ _id: id })
+    return await this.ProductModel.findOne(getUrlNameFilter(id))
       .populate('photos')
+      .populate('related_products', populateProductsSelector)
+      .populate('similar_products', populateProductsSelector)
       .exec()
   }
 
@@ -43,7 +46,7 @@ export class ProductsService {
 
   async update(id: string, data: UpdateProductDto): Promise<ProductI> {
     const updatedItem = await this.ProductModel.findOneAndUpdate(
-      { _id: id },
+      { $or: [{ _id: id }, { url_name: id }] },
       data,
       { new: true },
     )
@@ -51,8 +54,8 @@ export class ProductsService {
   }
 
   async delete(id: string): Promise<ProductI> {
-    const deletedProduct = await this.ProductModel.findByIdAndRemove({
-      _id: id,
+    const deletedProduct = await this.ProductModel.findOneAndRemove({
+      $or: [{ _id: id }, { url_name: id }],
     }).exec()
     return deletedProduct
   }

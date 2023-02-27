@@ -28,12 +28,14 @@ import { preparePhotos, thumbnailInterceptor } from 'src/utils/utils'
 import { PaginationQuery, PromisePaginationResT } from 'src/utils/interfaces'
 import mongoose from 'mongoose'
 import { AuthGuard } from '@nestjs/passport'
+import { NotFoundInterceptor } from 'src/utils/injectables'
 
 type ProductI = Product & { _id: mongoose.Types.ObjectId }
 
 @ApiBearerAuth()
 @ApiTags('Products')
 @Controller('products')
+@UseInterceptors(NotFoundInterceptor)
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
@@ -55,7 +57,12 @@ export class ProductsController {
     status: HttpStatus.OK,
     description: 'Successfully fetched product.',
   })
-  getTodoById(@Param('id') id: string): Promise<ProductI> {
+  getById(@Param('id') id: string): Promise<ProductI> {
+    // const item = await
+    // console.log(item)
+    // if (!item) {
+    //   throw new NotFoundException('Not Found')
+    // }
     return this.productsService.findOne(id)
   }
 
@@ -73,7 +80,7 @@ export class ProductsController {
     @Body() data: CreateProductMultipartDto,
     @UploadedFile() thumbnail: Express.Multer.File,
   ): Promise<ProductI> {
-    const product_data: any = { ...data }
+    const product_data: any = parseFormDataToJSON(data)
     product_data.name = JSON.parse(data.name)
     if (thumbnail) {
       preparePhotos([thumbnail], 640)

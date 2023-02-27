@@ -9,6 +9,7 @@ import {
   Delete,
   Patch,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common'
 import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { CreateTextBlockDto } from './dto/create-textBlock.dto'
@@ -16,10 +17,12 @@ import { UpdateTextBlockDto } from './dto/update-textBlock.dto'
 import { TextBlocksService } from './textBlocks.service'
 import { TextBlock } from 'src/schemas/text_block.schema'
 import { AuthGuard } from '@nestjs/passport'
+import { NotFoundInterceptor } from 'src/utils/injectables'
 
 @ApiBearerAuth()
 @ApiTags('Collections')
 @Controller('collections')
+@UseInterceptors(NotFoundInterceptor)
 export class TextBlocksController {
   constructor(private readonly textBlocksService: TextBlocksService) {}
 

@@ -29,8 +29,8 @@ export class Collection {
   @Prop({ default: [], type: [String] })
   keywords: string[]
 
-  @Prop({ required: false })
-  description: string
+  @Prop({ type: locales, required: false })
+  description: I_Locales
 
   @Prop({ default: 0, required: false })
   index: number

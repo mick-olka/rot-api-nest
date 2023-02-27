@@ -4,6 +4,7 @@ import mongoose, { Model } from 'mongoose'
 import { CreateCollectionDto } from './dto/create-collection.dto'
 import { Collection, CollectionDocument } from '../../schemas/collection.schema'
 import { UpdateCollectionDto } from './dto/update-collection.dto'
+import { getUrlNameFilter } from 'src/utils/utils'
 
 type CollectionI = Collection & { _id: mongoose.Types.ObjectId }
 
@@ -11,6 +12,8 @@ const populateProducts = {
   path: 'items',
   select: '_id name url_name price old_price thumbnail index',
 }
+
+const getAllCollectionsSelector = '_id name url_name index'
 
 @Injectable()
 export class CollectionsService {
@@ -20,11 +23,11 @@ export class CollectionsService {
   ) {}
 
   async findAll(): Promise<CollectionI[]> {
-    return this.CollectionModel.find().exec()
+    return this.CollectionModel.find().select(getAllCollectionsSelector).exec()
   }
 
   async findOne(id: string): Promise<CollectionI> {
-    return this.CollectionModel.findOne({ _id: id })
+    return this.CollectionModel.findOne(getUrlNameFilter(id))
       .populate(populateProducts)
       .exec()
   }
@@ -36,7 +39,7 @@ export class CollectionsService {
 
   async update(id: string, data: UpdateCollectionDto): Promise<CollectionI> {
     const updatedItem = await this.CollectionModel.findOneAndUpdate(
-      { _id: id },
+      { $or: [{ _id: id }, { url_name: id }] },
       data,
       { new: true },
     )
@@ -44,8 +47,8 @@ export class CollectionsService {
   }
 
   async delete(id: string): Promise<CollectionI> {
-    const deletedItem = await this.CollectionModel.findByIdAndRemove({
-      _id: id,
+    const deletedItem = await this.CollectionModel.findOneAndRemove({
+      $or: [{ _id: id }, { url_name: id }],
     }).exec()
     return deletedItem
   }

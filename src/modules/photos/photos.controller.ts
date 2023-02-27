@@ -27,10 +27,12 @@ import { Photos } from 'src/schemas/photos.schema'
 import { Response } from 'express'
 import { photosInterceptor, preparePhotos } from 'src/utils/utils'
 import { AuthGuard } from '@nestjs/passport'
+import { NotFoundInterceptor } from 'src/utils/injectables'
 
 @ApiBearerAuth()
 @ApiTags('Photos')
 @Controller('photos')
+@UseInterceptors(NotFoundInterceptor)
 export class PhotosController {
   constructor(private readonly photosService: PhotosService) {}
 

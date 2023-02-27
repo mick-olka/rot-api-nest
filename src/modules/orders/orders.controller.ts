@@ -10,6 +10,7 @@ import {
   Patch,
   Query,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common'
 import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { CreateOrderDto } from './dto/create-order.dto'
@@ -19,6 +20,7 @@ import { Order } from 'src/schemas/order.schema'
 import { PaginationQuery, PromisePaginationResT } from 'src/utils/interfaces'
 import mongoose from 'mongoose'
 import { AuthGuard } from '@nestjs/passport'
+import { NotFoundInterceptor } from 'src/utils/injectables'
 
 type OrderI = Order & { _id: mongoose.Types.ObjectId }
 
@@ -26,6 +28,7 @@ type OrderI = Order & { _id: mongoose.Types.ObjectId }
 @UseGuards(AuthGuard('jwt'))
 @ApiTags('Orders')
 @Controller('orders')
+@UseInterceptors(NotFoundInterceptor)
 export class OrdersController {
   constructor(private readonly ordersService: OrdersService) {}
 

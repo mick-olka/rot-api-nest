@@ -2,6 +2,7 @@ import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express'
 import { diskStorage } from 'multer'
 import { extname, join } from 'path'
 import jimp from 'jimp'
+import { isValidObjectId } from 'mongoose'
 
 export const getRandomFileName = () => {
   const timestamp = new Date().toISOString().replace(/[-:.]/g, '')
@@ -78,6 +79,13 @@ export const getFilterForSearch = (
     filter = { $or: regex_fields }
   }
   return filter
+}
+
+export const getUrlNameFilter = (id: string): any => {
+  if (isValidObjectId(id)) {
+    return { _id: id }
+  }
+  return { url_name: id }
 }
 
 const a = {

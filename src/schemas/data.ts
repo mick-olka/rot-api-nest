@@ -6,6 +6,7 @@ export const getMongoRef = (name: string, isArray?: boolean) => {
   if (isArray)
     return {
       type: [{ type: mongoose.Schema.Types.ObjectId, ref: name }],
+      unique: true,
       default: [],
     }
   return {
