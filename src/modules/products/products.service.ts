@@ -19,15 +19,17 @@ export class ProductsService {
   ) {}
 
   async findAll({
-    page = 1,
-    limit = 20,
+    page = '1',
+    limit = '20',
     regex,
   }: PaginationQuery): PromisePaginationResT<ProductI> {
+    const p = Number(page),
+      l = Number(limit)
     const filter = getFilterForSearch(regex, ['code', 'name.ua', 'name.en'])
     const count = await this.ProductModel.count(filter)
     const items = await this.ProductModel.find(filter)
-      .skip((page - 1) * limit)
-      .limit(limit)
+      .skip((p - 1) * l)
+      .limit(l)
     return { count, docs: items }
   }
 
@@ -46,7 +48,7 @@ export class ProductsService {
 
   async update(id: string, data: UpdateProductDto): Promise<ProductI> {
     const updatedItem = await this.ProductModel.findOneAndUpdate(
-      { $or: [{ _id: id }, { url_name: id }] },
+      getUrlNameFilter(id),
       data,
       { new: true },
     )
@@ -54,9 +56,23 @@ export class ProductsService {
   }
 
   async delete(id: string): Promise<ProductI> {
-    const deletedProduct = await this.ProductModel.findOneAndRemove({
-      $or: [{ _id: id }, { url_name: id }],
-    }).exec()
+    const deletedProduct = await this.ProductModel.findOneAndRemove(
+      getUrlNameFilter(id),
+    ).exec()
     return deletedProduct
+  }
+
+  async addPhotos(id: string, photos_id: string): Promise<ProductI> {
+    const updatedProduct = await this.ProductModel.findByIdAndUpdate(id, {
+      $addToSet: { photos: photos_id },
+    })
+    return updatedProduct
+  }
+
+  async removePhotos(id: string, photos_id: string): Promise<ProductI> {
+    const updatedProduct = await this.ProductModel.findByIdAndUpdate(id, {
+      $pull: { photos: photos_id },
+    })
+    return updatedProduct
   }
 }

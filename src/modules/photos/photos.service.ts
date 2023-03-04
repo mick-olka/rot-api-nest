@@ -7,6 +7,7 @@ import {
   Photos as PhotosSchema,
   PhotosDocument,
 } from 'src/schemas/photos.schema'
+import { ProductsService } from '../products/products.service'
 
 type PhotosI = PhotosSchema & { _id: mongoose.Types.ObjectId }
 
@@ -15,6 +16,7 @@ export class PhotosService {
   constructor(
     @InjectModel(PhotosSchema.name)
     private readonly PhotosModel: Model<PhotosDocument>,
+    private readonly productsService: ProductsService,
   ) {}
 
   async findAll(): Promise<PhotosI[]> {
@@ -25,8 +27,9 @@ export class PhotosService {
     return this.PhotosModel.findOne({ _id: id }).exec()
   }
 
-  async create(data: CreatePhotosDto): Promise<PhotosI> {
+  async create(product_id: string, data: CreatePhotosDto): Promise<PhotosI> {
     const createdItem = await this.PhotosModel.create(data)
+    await this.productsService.addPhotos(product_id, String(createdItem._id))
     return createdItem
   }
 
@@ -39,10 +42,11 @@ export class PhotosService {
     return updatedItem
   }
 
-  async delete(id: string): Promise<PhotosI> {
+  async delete(product_id: string, id: string): Promise<PhotosI> {
     const deletedItem = await this.PhotosModel.findByIdAndRemove({
       _id: id,
     }).exec()
+    await this.productsService.removePhotos(product_id, id)
     return deletedItem
   }
 }

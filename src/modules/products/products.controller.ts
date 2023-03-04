@@ -17,6 +17,7 @@ import {
 import {
   ApiBearerAuth,
   ApiConsumes,
+  ApiQuery,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger'
@@ -25,7 +26,7 @@ import { UpdateProductMultipartDto } from './dto/update-product.dto'
 import { ProductsService } from './products.service'
 import { Product } from 'src/schemas/product.schema'
 import { preparePhotos, thumbnailInterceptor } from 'src/utils/utils'
-import { PaginationQuery, PromisePaginationResT } from 'src/utils/interfaces'
+import { PromisePaginationResT } from 'src/utils/interfaces'
 import mongoose from 'mongoose'
 import { AuthGuard } from '@nestjs/passport'
 import { NotFoundInterceptor } from 'src/utils/injectables'
@@ -45,10 +46,32 @@ export class ProductsController {
     status: HttpStatus.OK,
     description: 'Successfully fetched products.',
   })
+  @ApiQuery({
+    name: 'page',
+    type: String,
+    description: 'Products page',
+    example: '1',
+    required: false,
+  })
+  @ApiQuery({
+    name: 'limit',
+    type: String,
+    description: 'Products limit',
+    example: '3',
+    required: false,
+  })
+  @ApiQuery({
+    name: 'regex',
+    type: String,
+    description: 'Products search',
+    required: false,
+  })
   async findAll(
-    @Query() query: PaginationQuery,
+    @Query('page') page: string,
+    @Query('limit') limit: string,
+    @Query('regex') regex: string,
   ): PromisePaginationResT<ProductI> {
-    return this.productsService.findAll(query)
+    return this.productsService.findAll({ page, limit, regex })
   }
 
   @Get(':id')
@@ -58,11 +81,6 @@ export class ProductsController {
     description: 'Successfully fetched product.',
   })
   getById(@Param('id') id: string): Promise<ProductI> {
-    // const item = await
-    // console.log(item)
-    // if (!item) {
-    //   throw new NotFoundException('Not Found')
-    // }
     return this.productsService.findOne(id)
   }
 

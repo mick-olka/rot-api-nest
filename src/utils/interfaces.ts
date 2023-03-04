@@ -1,5 +1,4 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { IsNumber } from 'class-validator'
 import mongoose from 'mongoose'
 
 export type MongoItem<T extends object> = T & { _id: mongoose.Types.ObjectId }
@@ -14,15 +13,13 @@ export class PaginationQuery {
     default: 1,
     required: false,
   })
-  @IsNumber()
-  page?: number
+  page?: string
 
   @ApiProperty({
     default: 5,
     required: false,
   })
-  @IsNumber()
-  limit?: number
+  limit?: string
 
   @ApiProperty({
     required: false,

@@ -13,10 +13,13 @@ import {
   ParseFilePipe,
   Res,
   UseGuards,
+  Query,
+  HttpException,
 } from '@nestjs/common'
 import {
   ApiBearerAuth,
   ApiConsumes,
+  ApiQuery,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger'
@@ -71,15 +74,27 @@ export class PhotosController {
   @HttpCode(HttpStatus.CREATED)
   @ApiResponse({
     status: HttpStatus.CREATED,
-    description: 'Successfully created collection.',
+    description: 'Successfully created photos.',
   })
   @ApiConsumes('multipart/form-data')
   @UseInterceptors(photosInterceptor)
+  @ApiQuery({
+    name: 'product_id',
+    type: String,
+    description: 'Bind photos to product',
+    required: true,
+  })
   async create(
+    @Query('product_id') product_id: string,
     @Body() data: CreatePhotoMultipartDto,
     @UploadedFiles(new ParseFilePipe({ validators: [] }))
     files: Array<Express.Multer.File>,
   ) {
+    if (!product_id)
+      throw new HttpException(
+        'product_id must be provided in query',
+        HttpStatus.BAD_REQUEST,
+      )
     const photos_data = {
       main_color: undefined,
       pill_color: undefined,
@@ -90,7 +105,7 @@ export class PhotosController {
     })
     preparePhotos(files, 1200)
     photos_data.path_arr = files.map((f) => f.path)
-    return this.photosService.create(photos_data)
+    return this.photosService.create(product_id, photos_data)
   }
 
   @Patch(':id')
@@ -123,7 +138,21 @@ export class PhotosController {
     status: HttpStatus.OK,
     description: 'Successfully deleted collection.',
   })
-  async delete(@Param('id') id: string) {
-    return this.photosService.delete(id)
+  @ApiQuery({
+    name: 'product_id',
+    type: String,
+    description: 'Delete binded photos from product',
+    required: true,
+  })
+  async delete(
+    @Query('product_id') product_id: string,
+    @Param('id') id: string,
+  ) {
+    if (!product_id)
+      throw new HttpException(
+        'product_id must be provided in query',
+        HttpStatus.BAD_REQUEST,
+      )
+    return this.photosService.delete(product_id, id)
   }
 }

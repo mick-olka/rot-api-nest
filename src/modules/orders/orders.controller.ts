@@ -12,12 +12,12 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common'
-import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger'
+import { ApiBearerAuth, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { CreateOrderDto } from './dto/create-order.dto'
 import { UpdateOrderDto } from './dto/update-order.dto'
 import { OrdersService } from './orders.service'
 import { Order } from 'src/schemas/order.schema'
-import { PaginationQuery, PromisePaginationResT } from 'src/utils/interfaces'
+import { PromisePaginationResT } from 'src/utils/interfaces'
 import mongoose from 'mongoose'
 import { AuthGuard } from '@nestjs/passport'
 import { NotFoundInterceptor } from 'src/utils/injectables'
@@ -38,10 +38,32 @@ export class OrdersController {
     status: HttpStatus.OK,
     description: 'Successfully fetched orders.',
   })
+  @ApiQuery({
+    name: 'page',
+    type: String,
+    description: 'Products page',
+    example: '1',
+    required: false,
+  })
+  @ApiQuery({
+    name: 'limit',
+    type: String,
+    description: 'Products limit',
+    example: '3',
+    required: false,
+  })
+  @ApiQuery({
+    name: 'regex',
+    type: String,
+    description: 'Products search',
+    required: false,
+  })
   async findAll(
-    @Query() query: PaginationQuery,
+    @Query('page') page: string,
+    @Query('limit') limit: string,
+    @Query('regex') regex: string,
   ): PromisePaginationResT<OrderI> {
-    return this.ordersService.findAll(query)
+    return this.ordersService.findAll({ page, limit, regex })
   }
 
   @Get(':id')

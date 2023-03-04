@@ -39,7 +39,7 @@ export class CollectionsService {
 
   async update(id: string, data: UpdateCollectionDto): Promise<CollectionI> {
     const updatedItem = await this.CollectionModel.findOneAndUpdate(
-      { $or: [{ _id: id }, { url_name: id }] },
+      getUrlNameFilter(id),
       data,
       { new: true },
     )
@@ -47,9 +47,9 @@ export class CollectionsService {
   }
 
   async delete(id: string): Promise<CollectionI> {
-    const deletedItem = await this.CollectionModel.findOneAndRemove({
-      $or: [{ _id: id }, { url_name: id }],
-    }).exec()
+    const deletedItem = await this.CollectionModel.findOneAndRemove(
+      getUrlNameFilter(id),
+    ).exec()
     return deletedItem
   }
 }

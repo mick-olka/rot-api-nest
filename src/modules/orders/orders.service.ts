@@ -27,17 +27,18 @@ export class OrdersService {
   ) {}
 
   async findAll({
-    page = 1,
-    limit = 20,
+    page = '1',
+    limit = '20',
     regex,
   }: PaginationQuery): PromisePaginationResT<OrderI> {
+    const p = Number(page),
+      l = Number(limit)
     const count = await this.OrderModel.count()
-    const items = await this.OrderModel.find(
-      getFilterForSearch(regex, ['name', 'phone']),
-    )
+    const filter = getFilterForSearch(regex, ['name', 'phone'])
+    const items = await this.OrderModel.find(filter)
       .sort({ date: -1 })
-      .skip((page - 1) * limit)
-      .limit(limit)
+      .skip((p - 1) * l)
+      .limit(l)
     return { count, docs: items }
   }
 
