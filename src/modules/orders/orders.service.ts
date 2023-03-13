@@ -15,7 +15,7 @@ const populateProducts = {
   populate: {
     path: 'product',
     model: Product.name,
-    select: '_id name url_name price thumbnail index',
+    select: '_id name url_name price product thumbnail index',
   },
 }
 

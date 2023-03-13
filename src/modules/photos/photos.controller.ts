@@ -11,7 +11,6 @@ import {
   UseInterceptors,
   UploadedFiles,
   ParseFilePipe,
-  Res,
   UseGuards,
   Query,
   HttpException,
@@ -27,7 +26,6 @@ import { CreatePhotoMultipartDto } from './dto/create-photos.dto'
 import { UpdatePhotoMultipartDto } from './dto/update-photos.dto'
 import { PhotosService } from './photos.service'
 import { Photos } from 'src/schemas/photos.schema'
-import { Response } from 'express'
 import { photosInterceptor, preparePhotos } from 'src/utils/utils'
 import { AuthGuard } from '@nestjs/passport'
 import { NotFoundInterceptor } from 'src/utils/injectables'
@@ -53,20 +51,10 @@ export class PhotosController {
   @HttpCode(HttpStatus.OK)
   @ApiResponse({
     status: HttpStatus.OK,
-    description: 'Successfully fetched collection.',
+    description: 'Successfully fetched photos.',
   })
   getTodoById(@Param('id') id: string): Promise<Photos> {
     return this.photosService.findOne(id)
-  }
-
-  // http://localhost:4000/photos/file/20230130T140642201Z443397.png
-  @Get('file/:fileId')
-  @HttpCode(HttpStatus.OK)
-  async serveAvatar(
-    @Param('fileId') fileId: string,
-    @Res() res: Response,
-  ): Promise<any> {
-    res.sendFile(fileId, { root: 'upload' })
   }
 
   @Post()
@@ -104,7 +92,7 @@ export class PhotosController {
       photos_data[key] = JSON.parse(value)
     })
     preparePhotos(files, 1200)
-    photos_data.path_arr = files.map((f) => f.path)
+    photos_data.path_arr = files.map((f) => f.filename)
     return this.photosService.create(product_id, photos_data)
   }
 
@@ -121,14 +109,15 @@ export class PhotosController {
     @Param('id') id: string,
     @Body() data: UpdatePhotoMultipartDto,
     @UploadedFiles(new ParseFilePipe({ validators: [] }))
-    files: Array<Express.Multer.File>,
+    files: Express.Multer.File[],
   ) {
-    const photos_data: Photos = undefined
+    const photos_data: Partial<Photos> = {}
     Object.entries(data).forEach(([key, value]) => {
       photos_data[key] = JSON.parse(value)
     })
-    photos_data.path_arr = files.map((f) => f.path)
-    return this.photosService.update(id, photos_data)
+    // if new files then add to set
+    if (files.length) photos_data.path_arr = files.map((f) => f.filename)
+    return this.photosService.update(id, photos_data, files)
   }
 
   @Delete(':id')
@@ -136,7 +125,7 @@ export class PhotosController {
   @HttpCode(HttpStatus.OK)
   @ApiResponse({
     status: HttpStatus.OK,
-    description: 'Successfully deleted collection.',
+    description: 'Successfully deleted photos.',
   })
   @ApiQuery({
     name: 'product_id',
@@ -154,5 +143,25 @@ export class PhotosController {
         HttpStatus.BAD_REQUEST,
       )
     return this.photosService.delete(product_id, id)
+  }
+
+  @Delete('photo/:id')
+  @UseGuards(AuthGuard('jwt'))
+  @HttpCode(HttpStatus.OK)
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Successfully deleted photos.',
+  })
+  @ApiQuery({
+    name: 'filename',
+    type: String,
+    description: 'Delete photos from photos',
+    required: true,
+  })
+  async deletePhoto(
+    @Param('id') id: string,
+    @Query('filename') filename: string,
+  ) {
+    return this.photosService.deletePhoto(id, filename)
   }
 }

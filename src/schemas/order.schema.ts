@@ -11,12 +11,14 @@ const status = {
   default: StatusEnum.w,
 }
 
-const orderItem = raw({
-  product: getMongoRef(Product.name),
-  count: { type: String, default: 1 },
-  main_color: { type: String, default: '' },
-  pill_color: { type: String, default: '' },
-})
+const orderItem = raw([
+  {
+    product: getMongoRef(Product.name),
+    count: { type: String, default: 1 },
+    main_color: { type: String, default: '' },
+    pill_color: { type: String, default: '' },
+  },
+])
 
 interface I_ProductPopulated {
   _id: string

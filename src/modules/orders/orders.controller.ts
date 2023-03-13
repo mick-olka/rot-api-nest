@@ -25,7 +25,7 @@ import { NotFoundInterceptor } from 'src/utils/injectables'
 type OrderI = Order & { _id: mongoose.Types.ObjectId }
 
 @ApiBearerAuth()
-@UseGuards(AuthGuard('jwt'))
+// @UseGuards(AuthGuard('jwt'))
 @ApiTags('Orders')
 @Controller('orders')
 @UseInterceptors(NotFoundInterceptor)

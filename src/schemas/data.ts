@@ -1,6 +1,5 @@
 import { raw } from '@nestjs/mongoose'
 import mongoose from 'mongoose'
-import { Product } from './product.schema'
 
 export const getMongoRef = (name: string, isArray?: boolean) => {
   if (isArray)
@@ -9,9 +8,7 @@ export const getMongoRef = (name: string, isArray?: boolean) => {
       unique: true,
       default: [],
     }
-  return {
-    type: { type: mongoose.Schema.Types.ObjectId, ref: name },
-  }
+  return { type: mongoose.Schema.Types.ObjectId, ref: name, required: true }
 }
 
 // ==============================

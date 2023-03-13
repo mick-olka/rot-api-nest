@@ -30,6 +30,7 @@ import { PromisePaginationResT } from 'src/utils/interfaces'
 import mongoose from 'mongoose'
 import { AuthGuard } from '@nestjs/passport'
 import { NotFoundInterceptor } from 'src/utils/injectables'
+import { deleteFile } from 'src/utils/files'
 
 type ProductI = Product & { _id: mongoose.Types.ObjectId }
 
@@ -102,7 +103,7 @@ export class ProductsController {
     product_data.name = JSON.parse(data.name)
     if (thumbnail) {
       preparePhotos([thumbnail], 640)
-      product_data.thumbnail = thumbnail.path
+      product_data.thumbnail = thumbnail.filename
     }
     if (!product_data.url_name) {
       const input: string = product_data.name.ua.toLowerCase()
@@ -136,7 +137,11 @@ export class ProductsController {
       product_data.description = JSON.parse(data.description)
     if (thumbnail) {
       preparePhotos([thumbnail], 640)
-      product_data.thumbnail = thumbnail.path
+      product_data.thumbnail = thumbnail.filename
+      const prevProd = await this.productsService.findOne(id)
+      const prevThumbmail = prevProd.thumbnail
+      const delRes = deleteFile(prevThumbmail)
+      if (delRes !== 0) console.log('====== FILE NOT FOUND =======')
     }
     return this.productsService.update(id, product_data)
   }

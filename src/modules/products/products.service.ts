@@ -38,7 +38,6 @@ export class ProductsService {
       .populate('photos')
       .populate('related_products', populateProductsSelector)
       .populate('similar_products', populateProductsSelector)
-      .exec()
   }
 
   async create(data: CreateProductDto): Promise<ProductI> {
@@ -58,7 +57,7 @@ export class ProductsService {
   async delete(id: string): Promise<ProductI> {
     const deletedProduct = await this.ProductModel.findOneAndRemove(
       getUrlNameFilter(id),
-    ).exec()
+    )
     return deletedProduct
   }
 

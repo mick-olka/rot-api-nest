@@ -8,6 +8,7 @@ import {
   PhotosDocument,
 } from 'src/schemas/photos.schema'
 import { ProductsService } from '../products/products.service'
+import { deleteFile } from 'src/utils/files'
 
 type PhotosI = PhotosSchema & { _id: mongoose.Types.ObjectId }
 
@@ -33,10 +34,20 @@ export class PhotosService {
     return createdItem
   }
 
-  async update(id: string, data: UpdatePhotosDto): Promise<PhotosI> {
+  async update(
+    id: string,
+    data: UpdatePhotosDto,
+    files: Express.Multer.File[],
+  ): Promise<PhotosI> {
+    const update_data: any = { ...data }
+    // if new files then add to set
+    if (files.length) {
+      delete update_data.path_arr
+      update_data.$addToSet = { path_arr: data.path_arr }
+    }
     const updatedItem = await this.PhotosModel.findOneAndUpdate(
       { _id: id },
-      data,
+      update_data,
       { new: true },
     )
     return updatedItem
@@ -46,7 +57,20 @@ export class PhotosService {
     const deletedItem = await this.PhotosModel.findByIdAndRemove({
       _id: id,
     }).exec()
-    await this.productsService.removePhotos(product_id, id)
+    await this.productsService.removePhotos(product_id, id) // remove photos ref in product
     return deletedItem
+  }
+
+  async deletePhoto(id: string, filename: string): Promise<PhotosI> {
+    const updated_photos = await this.PhotosModel.findOneAndUpdate(
+      { _id: id },
+      {
+        $pull: { path_arr: filename },
+      },
+      { new: true },
+    )
+    const deletion_result = deleteFile(filename)
+    if (deletion_result !== 0) console.log('======= FILE NOT FOUND ========')
+    return updated_photos
   }
 }

@@ -1,4 +1,11 @@
-import { Post, Body, HttpCode, UseGuards, Req } from '@nestjs/common/decorators'
+import {
+  Post,
+  Body,
+  HttpCode,
+  UseGuards,
+  Req,
+  Get,
+} from '@nestjs/common/decorators'
 import { Controller, HttpStatus } from '@nestjs/common'
 import { AuthGuard } from '@nestjs/passport'
 import { ApiTags, ApiResponse, ApiBearerAuth } from '@nestjs/swagger'
@@ -63,5 +70,20 @@ export class AuthController {
   refreshTokens(@Req() req: Request): Promise<{ new_token: string }> {
     const user = req.user
     return this.authService.refreshTokens(user['sub'], user['refreshToken'])
+  }
+
+  @UseGuards(AuthGuard('jwt'))
+  @Get('check')
+  @HttpCode(HttpStatus.OK)
+  @ApiResponse({
+    status: HttpStatus.ACCEPTED,
+    description: 'Authenticated',
+  })
+  @ApiResponse({
+    status: HttpStatus.FORBIDDEN,
+    description: 'Not authenticated',
+  })
+  checkLogin(): { logged: boolean } {
+    return { logged: true }
   }
 }

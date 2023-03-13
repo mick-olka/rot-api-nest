@@ -24,7 +24,7 @@ import { OrdersModule } from './modules/orders/orders.module'
     ServeStaticModule.forRoot({
       // http://localhost:4000/upload/20230130T140642201Z443397.png
       rootPath: join(__dirname, '..', 'upload'),
-      serveRoot: '/upload/', //last slash is important
+      serveRoot: '/api/upload/', //last slash is important
     }),
     ProductsModule,
     CollectionsModule,

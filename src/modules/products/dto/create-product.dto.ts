@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { IsNotEmpty, IsString, IsNumber } from 'class-validator'
+import { IsNotEmpty, IsString } from 'class-validator'
 import { default_locales, I_Locales, I_ProductFeatures } from 'src/schemas/data'
 import { Product } from 'src/schemas/product.schema'
 import { File } from 'src/utils/interfaces'
@@ -12,54 +12,51 @@ class ProductDto {
   @ApiProperty()
   @IsNotEmpty()
   @IsString()
-  readonly code: string
+  code: string
 
   @ApiProperty()
   @IsNotEmpty()
-  @IsNumber()
-  readonly price: number
+  price: number
 
   @ApiProperty(notRequired)
-  @IsNumber()
-  readonly old_price?: number
+  old_price?: number
 
   @ApiProperty(notRequired)
   @IsString()
-  readonly url_name?: string
+  url_name?: string
 
-  readonly keywords?: string[]
+  keywords?: string[]
 
-  readonly description?: I_Locales
+  description?: I_Locales
 
-  readonly features?: I_ProductFeatures
+  features?: I_ProductFeatures
 
-  readonly photos?: string[]
+  photos?: string[]
 
-  readonly related_products?: Product[]
+  related_products?: Product[]
 
-  readonly similar_products?: Product[]
+  similar_products?: Product[]
 
   @ApiProperty(notRequired)
-  @IsNumber()
-  readonly index?: number
+  index?: number
 }
 
 // for swagger
 export class CreateProductMultipartDto extends ProductDto {
   @ApiProperty({ default: default_locales })
   @IsString()
-  readonly name: string
+  name: string
 
   @ApiProperty({
     type: 'string',
     format: 'binary',
     required: false,
   })
-  readonly thumbnail?: File
+  thumbnail?: File
 }
 
 // for internal use
 export class CreateProductDto extends ProductDto {
-  readonly name: I_Locales
-  readonly thumbnail?: string
+  name: I_Locales
+  thumbnail?: string
 }
