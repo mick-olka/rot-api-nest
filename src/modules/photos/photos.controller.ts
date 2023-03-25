@@ -18,6 +18,7 @@ import {
 import {
   ApiBearerAuth,
   ApiConsumes,
+  ApiOperation,
   ApiQuery,
   ApiResponse,
   ApiTags,
@@ -99,6 +100,7 @@ export class PhotosController {
   @Patch(':id')
   @UseGuards(AuthGuard('jwt'))
   @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Update photos group with or add photos' })
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Successfully updated photos.',
@@ -148,6 +150,7 @@ export class PhotosController {
   @Delete('photo/:id')
   @UseGuards(AuthGuard('jwt'))
   @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Remove photo from group' })
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Successfully deleted photos.',

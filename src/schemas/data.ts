@@ -5,7 +5,7 @@ export const getMongoRef = (name: string, isArray?: boolean) => {
   if (isArray)
     return {
       type: [{ type: mongoose.Schema.Types.ObjectId, ref: name }],
-      unique: true,
+      // unique: true,
       default: [],
     }
   return { type: mongoose.Schema.Types.ObjectId, ref: name, required: true }
@@ -13,36 +13,34 @@ export const getMongoRef = (name: string, isArray?: boolean) => {
 
 // ==============================
 
-export const default_locales = {
-  en: '',
-  ua: '',
+export enum E_Languages {
+  ua = 'ua',
+  en = 'en',
+  de = 'de',
 }
 
-export interface I_Locales {
-  ua: string
-  en: string
+const lanEnumToObject = <T>(value: T): { [key in E_Languages]: T } => {
+  return {
+    en: value,
+    ua: value,
+    de: value,
+  }
 }
 
-export const locales = raw({
-  ua: { type: String, required: true },
-  en: { type: String, required: true },
-})
+export type I_Locales = {
+  [key in E_Languages]: string
+}
+
+export const default_locales: I_Locales = lanEnumToObject('')
+
+export const locales = raw(lanEnumToObject({ type: String, default: '' }))
 
 // ================================
 
-export const default_features = {
-  ua: [],
-  en: [],
-}
+export const default_features = lanEnumToObject([])
 
-export interface I_ProductFeatures {
-  ua: [
-    {
-      key: string
-      value: string
-    },
-  ]
-  en: [
+export type I_ProductFeatures = {
+  [key in E_Languages]: [
     {
       key: string
       value: string
@@ -50,20 +48,14 @@ export interface I_ProductFeatures {
   ]
 }
 
-export const productFeatures = raw({
-  ua: [
+export const productFeatures = raw(
+  lanEnumToObject([
     {
       key: { type: String, required: true },
       value: { type: String, required: true },
     },
-  ],
-  en: [
-    {
-      key: { type: String, required: true },
-      value: { type: String, required: true },
-    },
-  ],
-})
+  ]),
+)
 
 // ==================================
 

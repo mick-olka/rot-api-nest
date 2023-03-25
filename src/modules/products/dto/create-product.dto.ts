@@ -22,7 +22,7 @@ class ProductDto {
   old_price?: number
 
   @ApiProperty(notRequired)
-  @IsString()
+  // @IsString()
   url_name?: string
 
   keywords?: string[]

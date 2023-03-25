@@ -101,10 +101,6 @@ export class ProductsController {
   ): Promise<ProductI> {
     const product_data: any = parseFormDataToJSON(data)
     product_data.name = JSON.parse(data.name)
-    if (thumbnail) {
-      preparePhotos([thumbnail], 640)
-      product_data.thumbnail = thumbnail.filename
-    }
     if (!product_data.url_name) {
       const input: string = product_data.name.ua.toLowerCase()
       const transliterated: string = input
@@ -112,6 +108,10 @@ export class ProductsController {
         .map((w) => transliterate(w))
         .join('_')
       product_data.url_name = transliterated
+    }
+    if (thumbnail) {
+      preparePhotos([thumbnail], 640)
+      product_data.thumbnail = thumbnail.filename
     }
     return this.productsService.create(product_data)
   }
