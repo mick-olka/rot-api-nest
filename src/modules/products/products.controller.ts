@@ -156,7 +156,7 @@ export class ProductsController {
   @ApiResponse({ status: HttpStatus.FORBIDDEN, description: 'Forbidden.' })
   async delete(@Param('id') id: string): Promise<ProductI> {
     const data = await this.productsService.findOne(id)
-    if (data) {
+    if (data && data.thumbnail) {
       const delRes = deleteFile(data.thumbnail)
       if (delRes !== 0) console.log('====== FILE NOT FOUND =======')
     }
