@@ -14,9 +14,10 @@ async function bootstrap() {
     allowedHeaders: '*',
   })
   app.setGlobalPrefix('/api')
-  app.useGlobalPipes(new ValidationPipe())
+  // app.useGlobalPipes(new ValidationPipe())
   app.use(bodyParser.json({ limit: '50mb' }))
   app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }))
+  app.useGlobalPipes(new ValidationPipe())
   const config = new DocumentBuilder()
     .setTitle('Template')
     .setDescription('Template API description')

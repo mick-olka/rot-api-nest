@@ -160,11 +160,18 @@ const a = {
   '`': 'j',
 }
 
-export const transliterate = (word: string): string => {
-  return word
-    .split('')
-    .map((char) => {
-      return a[char] || char
-    })
-    .join('')
+export const transliterate = (text: string): string => {
+  const res = text
+    .toLowerCase()
+    .split(' ')
+    .map((word) =>
+      word
+        .split('')
+        .map((char) => {
+          return a[char] || char
+        })
+        .join(''),
+    )
+    .join('_')
+  return res
 }

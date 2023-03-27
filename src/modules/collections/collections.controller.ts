@@ -10,14 +10,19 @@ import {
   Patch,
   UseGuards,
   UseInterceptors,
+  Put,
 } from '@nestjs/common'
 import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { CreateCollectionDto } from './dto/create-collection.dto'
-import { UpdateCollectionDto } from './dto/update-collection.dto'
+import {
+  UpdateCollectionDto,
+  UpdateCollectionItemsDto,
+} from './dto/update-collection.dto'
 import { CollectionsService } from './collections.service'
 import { Collection } from 'src/schemas/collection.schema'
 import { AuthGuard } from '@nestjs/passport'
 import { NotFoundInterceptor } from 'src/utils/injectables'
+import { transliterate } from 'src/utils/utils'
 
 @ApiBearerAuth()
 @ApiTags('Collections')
@@ -56,7 +61,11 @@ export class CollectionsController {
   })
   @ApiResponse({ status: HttpStatus.FORBIDDEN, description: 'Forbidden.' })
   async create(@Body() data: CreateCollectionDto) {
-    return this.collectionsService.create(data)
+    const create_data = { ...data }
+    if (!data.url_name) {
+      create_data.url_name = transliterate(data.name.ua)
+    }
+    return this.collectionsService.create(create_data)
   }
 
   @Patch(':id')
@@ -69,6 +78,25 @@ export class CollectionsController {
   @ApiResponse({ status: HttpStatus.FORBIDDEN, description: 'Forbidden.' })
   async update(@Param('id') id: string, @Body() data: UpdateCollectionDto) {
     return this.collectionsService.update(id, data)
+  }
+
+  @Put(':id')
+  @UseGuards(AuthGuard('jwt'))
+  @HttpCode(HttpStatus.OK)
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Successfully updated collection.',
+  })
+  @ApiResponse({ status: HttpStatus.FORBIDDEN, description: 'Forbidden.' })
+  async updateItems(
+    @Param('id') id: string,
+    @Body() data: UpdateCollectionItemsDto,
+  ) {
+    let update_data = {}
+    if (data.action === 'add')
+      update_data = { $addToSet: { items: data.items } }
+    else update_data = { $pull: { items: data.items } }
+    return this.collectionsService.update(id, update_data)
   }
 
   @Delete(':id')
