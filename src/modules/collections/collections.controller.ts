@@ -95,7 +95,7 @@ export class CollectionsController {
     let update_data = {}
     if (data.action === 'add')
       update_data = { $addToSet: { items: data.items } }
-    else update_data = { $pull: { items: data.items } }
+    else update_data = { $pullAll: { items: data.items } }
     return this.collectionsService.update(id, update_data)
   }
 
