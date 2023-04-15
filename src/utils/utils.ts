@@ -58,9 +58,9 @@ export const preparePhotos = (
           .quality(72) // set JPEG quality
         const w = img.getWidth(),
           h = img.getHeight()
-        watermark.scaleToFit(w - 100, 500)
+        watermark.scaleToFit(w / 2, 500)
         img
-          .composite(watermark, 50, h / 2 - 145) // set watermark
+          .composite(watermark, w * 0.25, h / 2 - 145) // set watermark
           .write(files[i].path) // save
       }
     })

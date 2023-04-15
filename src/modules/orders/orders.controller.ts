@@ -33,6 +33,7 @@ export class OrdersController {
   constructor(private readonly ordersService: OrdersService) {}
 
   @Get()
+  @UseGuards(AuthGuard('jwt'))
   @HttpCode(HttpStatus.OK)
   @ApiResponse({
     status: HttpStatus.OK,
@@ -67,12 +68,12 @@ export class OrdersController {
   }
 
   @Get(':id')
+  @UseGuards(AuthGuard('jwt'))
   @HttpCode(HttpStatus.OK)
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Successfully fetched order.',
   })
-  //   @ApiResponse({ status: HttpStatus.FORBIDDEN, description: 'Forbidden.' })
   getTodoById(@Param('id') id: string): Promise<OrderI> {
     return this.ordersService.findOne(id)
   }
@@ -83,18 +84,17 @@ export class OrdersController {
     status: HttpStatus.CREATED,
     description: 'Successfully created order.',
   })
-  //   @ApiResponse({ status: HttpStatus.FORBIDDEN, description: 'Forbidden.' })
   async create(@Body() data: CreateOrderDto): Promise<OrderI> {
     return this.ordersService.create(data)
   }
 
   @Patch(':id')
+  @UseGuards(AuthGuard('jwt'))
   @HttpCode(HttpStatus.OK)
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Successfully updated order.',
   })
-  //   @ApiResponse({ status: HttpStatus.FORBIDDEN, description: 'Forbidden.' })
   async update(
     @Param('id') id: string,
     @Body() data: UpdateOrderDto,
@@ -103,6 +103,7 @@ export class OrdersController {
   }
 
   @Delete(':id')
+  @UseGuards(AuthGuard('jwt'))
   @HttpCode(HttpStatus.OK)
   @ApiResponse({
     status: HttpStatus.OK,

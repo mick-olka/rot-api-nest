@@ -118,7 +118,10 @@ export class PhotosController {
       photos_data[key] = JSON.parse(value)
     })
     // if new files then add to set
-    if (files.length) photos_data.path_arr = files.map((f) => f.filename)
+    if (files.length) {
+      photos_data.path_arr = files.map((f) => f.filename)
+      preparePhotos(files, 1200)
+    }
     return this.photosService.update(id, photos_data, files)
   }
 

@@ -54,6 +54,7 @@ export class PhotosService {
   }
 
   async delete(product_id: string, id: string): Promise<PhotosI> {
+    // const photos = delete
     const deletedItem = await this.PhotosModel.findByIdAndRemove({
       _id: id,
     }).exec()
