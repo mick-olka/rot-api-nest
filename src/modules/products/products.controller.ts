@@ -134,8 +134,7 @@ export class ProductsController {
       product_data.thumbnail = thumbnail.filename
       const prevProd = await this.productsService.findOne(id)
       const prevThumbmail = prevProd.thumbnail
-      const delRes = deleteFile(prevThumbmail)
-      if (delRes !== 0) console.log('====== FILE NOT FOUND =======')
+      deleteFile(prevThumbmail)
     }
     return this.productsService.update(id, product_data)
   }
@@ -151,8 +150,7 @@ export class ProductsController {
   async delete(@Param('id') id: string): Promise<ProductI> {
     const data = await this.productsService.findOne(id)
     if (data && data.thumbnail) {
-      const delRes = deleteFile(data.thumbnail)
-      if (delRes !== 0) console.log('====== FILE NOT FOUND =======')
+      deleteFile(data.thumbnail)
     }
     return this.productsService.delete(id)
   }

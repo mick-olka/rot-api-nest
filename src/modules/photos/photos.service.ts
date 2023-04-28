@@ -70,8 +70,7 @@ export class PhotosService {
       },
       { new: true },
     )
-    const deletion_result = deleteFile(filename)
-    if (deletion_result !== 0) console.log('======= FILE NOT FOUND ========')
+    deleteFile(filename)
     return updated_photos
   }
 }
