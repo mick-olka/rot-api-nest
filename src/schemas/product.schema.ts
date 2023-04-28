@@ -44,7 +44,7 @@ export class Product {
 
   @ApiProperty({ type: [String] })
   @Prop(getMongoRef(Photos.name, true))
-  photos: Photos[]
+  photos: string[]
 
   @Prop(getMongoRef(Product.name, true))
   related_products: Product[]

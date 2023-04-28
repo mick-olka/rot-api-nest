@@ -1,5 +1,5 @@
 import mongoose, { Model } from 'mongoose'
-import { Injectable } from '@nestjs/common'
+import { Inject, Injectable, forwardRef } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
 import { CreatePhotosDto } from './dto/create-photos.dto'
 import { UpdatePhotosDto } from './dto/update-photos.dto'
@@ -17,6 +17,7 @@ export class PhotosService {
   constructor(
     @InjectModel(PhotosSchema.name)
     private readonly PhotosModel: Model<PhotosDocument>,
+    @Inject(forwardRef(() => ProductsService))
     private readonly productsService: ProductsService,
   ) {}
 
@@ -58,6 +59,9 @@ export class PhotosService {
     const deletedItem = await this.PhotosModel.findByIdAndRemove({
       _id: id,
     }).exec()
+    for (const i in deletedItem.path_arr) {
+      deleteFile(deletedItem.path_arr[i])
+    }
     await this.productsService.removePhotos(product_id, id) // remove photos ref in product
     return deletedItem
   }

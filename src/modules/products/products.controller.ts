@@ -133,8 +133,8 @@ export class ProductsController {
       preparePhotos([thumbnail], 640)
       product_data.thumbnail = thumbnail.filename
       const prevProd = await this.productsService.findOne(id)
-      const prevThumbmail = prevProd.thumbnail
-      deleteFile(prevThumbmail)
+      const prevThumbnail = prevProd.thumbnail
+      deleteFile(prevThumbnail)
     }
     return this.productsService.update(id, product_data)
   }
@@ -149,8 +149,11 @@ export class ProductsController {
   @ApiResponse({ status: HttpStatus.FORBIDDEN, description: 'Forbidden.' })
   async delete(@Param('id') id: string): Promise<ProductI> {
     const data = await this.productsService.findOne(id)
-    if (data && data.thumbnail) {
-      deleteFile(data.thumbnail)
+    if (data) {
+      if (data.thumbnail) {
+        deleteFile(data.thumbnail)
+      }
+      // delete photos lists
     }
     return this.productsService.delete(id)
   }

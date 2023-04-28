@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common'
+import { Inject, Injectable, forwardRef } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
 import mongoose, { Model } from 'mongoose'
 import { CreateProductDto } from './dto/create-product.dto'
@@ -6,6 +6,7 @@ import { Product, ProductDocument } from '../../schemas/product.schema'
 import { UpdateProductDto } from './dto/update-product.dto'
 import { PaginationQuery, PromisePaginationResT } from 'src/utils/interfaces'
 import { getFilterForSearch, getUrlNameFilter } from 'src/utils/utils'
+import { PhotosService } from '../photos/photos.service'
 
 type ProductI = Product & { _id: mongoose.Types.ObjectId }
 
@@ -15,7 +16,9 @@ const populateProductsSelector = '_id name url_name thumbnail price old_price'
 export class ProductsService {
   constructor(
     @InjectModel(Product.name)
-    private readonly ProductModel: Model<ProductDocument>,
+    private readonly ProductModel: Model<ProductDocument>, // private readonly photosService: PhotosService,
+    @Inject(forwardRef(() => PhotosService))
+    private readonly photosService: PhotosService,
   ) {}
 
   async findAll({
@@ -58,6 +61,13 @@ export class ProductsService {
     const deletedProduct = await this.ProductModel.findOneAndRemove(
       getUrlNameFilter(id),
     )
+    // delete all photos
+    for (const i in deletedProduct.photos) {
+      await this.photosService.delete(
+        String(deletedProduct._id),
+        deletedProduct.photos[i],
+      )
+    }
     return deletedProduct
   }
 
