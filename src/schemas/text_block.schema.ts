@@ -1,13 +1,8 @@
 import { Prop, raw, Schema, SchemaFactory } from '@nestjs/mongoose'
 import { HydratedDocument } from 'mongoose'
-import { I_Locales } from './data'
+import { I_Locales, locales } from './data'
 
 export type TextBlockDocument = HydratedDocument<TextBlock>
-
-const localesNotRequired = raw({
-  ua: { type: String, required: false },
-  en: { type: String, required: false },
-})
 
 const fontFields = raw({
   size: { type: Number, required: false },
@@ -20,7 +15,7 @@ export class TextBlock {
   @Prop({ type: String, required: true, unique: true })
   name: string
 
-  @Prop(localesNotRequired)
+  @Prop(locales)
   text: I_Locales
 
   @Prop({ required: false, type: fontFields })

@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { IsString, IsNumber, IsPhoneNumber, IsOptional } from 'class-validator'
+import { IsString, IsNumber, IsOptional } from 'class-validator'
 import { I_Locales, StatusEnum } from 'src/schemas/data'
 import { default_cart_item, I_OrderItemDto, orderItem } from './data'
 
@@ -12,7 +12,6 @@ export class UpdateOrderDto {
 
   @ApiProperty(notRequired)
   @IsOptional()
-  @IsPhoneNumber()
   readonly phone?: string
 
   @ApiProperty(notRequired)

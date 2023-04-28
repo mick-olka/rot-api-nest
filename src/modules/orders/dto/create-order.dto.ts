@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { IsString, IsPhoneNumber, IsNumber, IsNotEmpty } from 'class-validator'
+import { IsString, IsNumber, IsNotEmpty } from 'class-validator'
 import { I_Locales, StatusEnum } from 'src/schemas/data'
 import { default_cart_item, I_OrderItemDto, orderItem } from './data'
 
@@ -12,7 +12,6 @@ export class CreateOrderDto {
   readonly name: I_Locales
 
   @ApiProperty({ default: '+380963963930' })
-  @IsPhoneNumber()
   @IsNotEmpty()
   readonly phone: string
 

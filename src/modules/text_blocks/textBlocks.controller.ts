@@ -20,8 +20,8 @@ import { AuthGuard } from '@nestjs/passport'
 import { NotFoundInterceptor } from 'src/utils/injectables'
 
 @ApiBearerAuth()
-@ApiTags('Collections')
-@Controller('collections')
+@ApiTags('Text_Blocks')
+@Controller('text_blocks')
 @UseInterceptors(NotFoundInterceptor)
 export class TextBlocksController {
   constructor(private readonly textBlocksService: TextBlocksService) {}
@@ -47,7 +47,7 @@ export class TextBlocksController {
   }
 
   @Post()
-  @UseGuards(AuthGuard('jwt'))
+  // @UseGuards(AuthGuard('jwt'))
   @HttpCode(HttpStatus.CREATED)
   @ApiResponse({
     status: HttpStatus.CREATED,

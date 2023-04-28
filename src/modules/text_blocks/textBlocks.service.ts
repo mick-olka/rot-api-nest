@@ -7,11 +7,6 @@ import { UpdateTextBlockDto } from './dto/update-textBlock.dto'
 
 type TextBlockI = TextBlock & { _id: mongoose.Types.ObjectId }
 
-const populateProducts = {
-  path: 'items',
-  select: '_id name url_name price old_price thumbnail index',
-}
-
 @Injectable()
 export class TextBlocksService {
   constructor(
@@ -24,9 +19,7 @@ export class TextBlocksService {
   }
 
   async findOne(id: string): Promise<TextBlockI> {
-    return this.TextBlockModel.findOne({ _id: id })
-      .populate(populateProducts)
-      .exec()
+    return this.TextBlockModel.findOne({ _id: id }).exec()
   }
 
   async create(data: CreateTextBlockDto): Promise<TextBlockI> {
