@@ -113,19 +113,13 @@ export class CollectionsController {
     if (data.action === 'add')
       update_data = { $addToSet: { items: data.items } }
     else update_data = { $pullAll: { items: data.items } }
-    // add collection to products
+    // add or remove collection to products
     for (const i in data.items) {
-      const prod = await this.productsService.findOne(data.items[i])
-      const collections_list = prod.collections
-      const new_list = updateSet(
-        collections_list,
-        [id],
-        data.action === 'delete',
-      )
-      console.log(new_list)
-      this.productsService.update(data.items[i], {
-        collections: new_list,
-      })
+      let new_data = {}
+      if (data.action === 'add')
+        new_data = { $addToSet: { collections: data.items } }
+      else new_data = { $pullAll: { collections: data.items } }
+      await this.productsService.update(data.items[i], new_data)
     }
     return this.collectionsService.update(id, update_data)
   }

@@ -160,7 +160,6 @@ export class ProductsController {
       if (data.thumbnail) {
         deleteFile(data.thumbnail)
       }
-      // delete photos lists
     }
     return this.productsService.delete(id)
   }

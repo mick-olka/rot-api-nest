@@ -7,6 +7,7 @@ import { UpdateProductDto } from './dto/update-product.dto'
 import { PaginationQuery, PromisePaginationResT } from 'src/utils/interfaces'
 import { getFilterForSearch, getUrlNameFilter } from 'src/utils/utils'
 import { PhotosService } from '../photos/photos.service'
+import { CollectionsService } from '../collections/collections.service'
 
 type ProductI = Product & { _id: mongoose.Types.ObjectId }
 
@@ -19,6 +20,8 @@ export class ProductsService {
     private readonly ProductModel: Model<ProductDocument>, // private readonly photosService: PhotosService,
     @Inject(forwardRef(() => PhotosService))
     private readonly photosService: PhotosService,
+    @Inject(forwardRef(() => CollectionsService))
+    private readonly collectionsService: CollectionsService,
   ) {}
 
   async findAll({
@@ -61,6 +64,17 @@ export class ProductsService {
     const deletedProduct = await this.ProductModel.findOneAndRemove(
       getUrlNameFilter(id),
     )
+    // remove product from collections
+    for (const i in deletedProduct.collections) {
+      let new_data = {}
+      new_data = {
+        $pullAll: [id],
+      }
+      await this.collectionsService.update(
+        deletedProduct.collections[i],
+        new_data,
+      )
+    }
     // delete all photos
     for (const i in deletedProduct.photos) {
       await this.photosService.delete(
