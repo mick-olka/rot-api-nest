@@ -10,29 +10,31 @@ const notRequired = {
 
 class ProductDto {
   @ApiProperty(notRequired)
-  readonly url_name?: string
+  url_name?: string
 
   @ApiProperty(notRequired)
-  readonly code?: string
+  code?: string
 
   @ApiProperty(notRequired)
-  readonly price?: number
+  price?: number
 
   @ApiProperty(notRequired)
-  readonly old_price?: number
+  old_price?: number
 
-  readonly keywords?: string[]
+  keywords?: string[]
 
-  readonly features?: I_ProductFeatures
+  features?: I_ProductFeatures
 
-  readonly photos?: string[]
+  photos?: string[]
 
-  readonly related_products?: Product[]
+  related_products?: string[]
 
-  readonly similar_products?: Product[]
+  similar_products?: string[]
+
+  collections?: string[]
 
   @ApiProperty(notRequired)
-  readonly index?: number
+  index?: number
 }
 
 export class UpdateProductMultipartDto extends ProductDto {

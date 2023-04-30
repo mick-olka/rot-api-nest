@@ -11,6 +11,7 @@ import {
   UseGuards,
   UseInterceptors,
   Put,
+  HttpException,
 } from '@nestjs/common'
 import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { CreateCollectionDto } from './dto/create-collection.dto'
@@ -22,14 +23,18 @@ import { CollectionsService } from './collections.service'
 import { Collection } from 'src/schemas/collection.schema'
 import { AuthGuard } from '@nestjs/passport'
 import { NotFoundInterceptor } from 'src/utils/injectables'
-import { transliterate } from 'src/utils/utils'
+import { updateSet, transliterate } from 'src/utils/utils'
+import { ProductsService } from '../products/products.service'
 
 @ApiBearerAuth()
 @ApiTags('Collections')
 @Controller('collections')
 @UseInterceptors(NotFoundInterceptor)
 export class CollectionsController {
-  constructor(private readonly collectionsService: CollectionsService) {}
+  constructor(
+    private readonly collectionsService: CollectionsService,
+    private readonly productsService: ProductsService,
+  ) {}
 
   @Get()
   @HttpCode(HttpStatus.OK)
@@ -62,6 +67,12 @@ export class CollectionsController {
   @ApiResponse({ status: HttpStatus.FORBIDDEN, description: 'Forbidden.' })
   async create(@Body() data: CreateCollectionDto) {
     const create_data = { ...data }
+    if (create_data.items) {
+      throw new HttpException(
+        'Forbidden field "collections". Use PUT api/collections/ to update collection items',
+        HttpStatus.BAD_REQUEST,
+      )
+    }
     if (!data.url_name) {
       create_data.url_name = transliterate(data.name.ua)
     }
@@ -77,6 +88,12 @@ export class CollectionsController {
   })
   @ApiResponse({ status: HttpStatus.FORBIDDEN, description: 'Forbidden.' })
   async update(@Param('id') id: string, @Body() data: UpdateCollectionDto) {
+    if (data.items) {
+      throw new HttpException(
+        'Forbidden field "collections". Use PUT api/collections/ to update collection items',
+        HttpStatus.BAD_REQUEST,
+      )
+    }
     return this.collectionsService.update(id, data)
   }
 
@@ -96,6 +113,20 @@ export class CollectionsController {
     if (data.action === 'add')
       update_data = { $addToSet: { items: data.items } }
     else update_data = { $pullAll: { items: data.items } }
+    // add collection to products
+    for (const i in data.items) {
+      const prod = await this.productsService.findOne(data.items[i])
+      const collections_list = prod.collections
+      const new_list = updateSet(
+        collections_list,
+        [id],
+        data.action === 'delete',
+      )
+      console.log(new_list)
+      this.productsService.update(data.items[i], {
+        collections: new_list,
+      })
+    }
     return this.collectionsService.update(id, update_data)
   }
 

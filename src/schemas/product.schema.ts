@@ -1,4 +1,5 @@
 import { Photos } from './photos.schema'
+import { Collection } from './collection.schema'
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
 import { HydratedDocument } from 'mongoose'
 import {
@@ -46,10 +47,14 @@ export class Product {
   @Prop(getMongoRef(Photos.name, true))
   photos: string[]
 
-  @Prop(getMongoRef(Product.name, true))
+  @ApiProperty({ type: [String] })
+  @Prop(getMongoRef('Collection', true))
+  collections: string[]
+
+  @Prop(getMongoRef('Product', true))
   related_products: Product[]
 
-  @Prop(getMongoRef(Product.name, true))
+  @Prop(getMongoRef('Product', true))
   similar_products: Product[]
 
   @Prop({ default: 0, required: false })

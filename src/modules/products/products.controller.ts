@@ -13,6 +13,7 @@ import {
   UploadedFile,
   Query,
   UseGuards,
+  HttpException,
 } from '@nestjs/common'
 import {
   ApiBearerAuth,
@@ -101,6 +102,12 @@ export class ProductsController {
   ): Promise<ProductI> {
     const product_data: any = parseFormDataToJSON(data)
     product_data.name = JSON.parse(data.name)
+    if (product_data.collections) {
+      throw new HttpException(
+        'Forbidden field "collections". Use PUT api/collections/ to update collection items',
+        HttpStatus.BAD_REQUEST,
+      )
+    }
     if (!product_data.url_name)
       product_data.url_name = transliterate(product_data.name.ua)
     if (thumbnail) {

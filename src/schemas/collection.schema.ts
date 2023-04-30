@@ -23,7 +23,7 @@ export class Collection {
   @Prop({ unique: true })
   url_name: string
 
-  @Prop(getMongoRef(Product.name, true))
+  @Prop(getMongoRef('Product', true))
   items: I_ProductPopulated[]
 
   @Prop({ default: [], type: [String] })

@@ -88,6 +88,20 @@ export const getUrlNameFilter = (id: string): any => {
   return { url_name: id }
 }
 
+export const updateSet = (
+  arr: string[],
+  items: string[],
+  remove?: boolean,
+): string[] => {
+  let new_arr = arr.map((e) => String(e))
+  items.forEach((it) => {
+    const includes = arr.includes(it)
+    if (includes && remove) new_arr = new_arr.filter((e) => e !== it)
+    else if (!includes) new_arr.push(it)
+  })
+  return new_arr
+}
+
 const a = {
   Ё: 'YO',
   Й: 'I',
