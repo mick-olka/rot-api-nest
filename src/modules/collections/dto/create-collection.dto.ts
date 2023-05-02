@@ -1,5 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { IsString, IsNumber, IsNotEmptyObject } from 'class-validator'
+import {
+  IsString,
+  IsNumber,
+  IsNotEmptyObject,
+  IsOptional,
+  IsArray,
+} from 'class-validator'
 import { default_locales, I_Locales } from 'src/schemas/data'
 import { Product } from 'src/schemas/product.schema'
 
@@ -13,16 +19,23 @@ export class CreateCollectionDto {
   readonly name: I_Locales
 
   @ApiProperty(notRequired)
-  // @IsString()
+  @IsOptional()
+  @IsString()
   readonly url_name?: string
 
+  @IsOptional()
+  @IsArray()
   readonly items?: Product[]
 
+  @IsOptional()
+  @IsArray()
   readonly keywords?: string[]
 
+  @IsOptional()
   readonly description?: I_Locales
 
   @ApiProperty(notRequired)
-  // @IsNumber()
+  @IsOptional()
+  @IsNumber()
   readonly index?: number
 }

@@ -90,7 +90,7 @@ export class CollectionsController {
   async update(@Param('id') id: string, @Body() data: UpdateCollectionDto) {
     if (data.items) {
       throw new HttpException(
-        'Forbidden field "collections". Use PUT api/collections/ to update collection items',
+        'Forbidden field "items". Use PUT api/collections/ to update collection items',
         HttpStatus.BAD_REQUEST,
       )
     }

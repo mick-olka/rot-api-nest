@@ -34,6 +34,7 @@ export class ProductsService {
     const filter = getFilterForSearch(regex, ['code', 'name.ua', 'name.en'])
     const count = await this.ProductModel.count(filter)
     const items = await this.ProductModel.find(filter)
+      .sort({ index: 'asc' })
       .skip((p - 1) * l)
       .limit(l)
     return { count, docs: items }

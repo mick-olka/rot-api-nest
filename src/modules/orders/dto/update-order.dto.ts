@@ -12,20 +12,22 @@ export class UpdateOrderDto {
 
   @ApiProperty(notRequired)
   @IsOptional()
+  @IsString()
   readonly phone?: string
 
   @ApiProperty(notRequired)
-  @IsString()
   @IsOptional()
+  @IsString()
   readonly message?: string
 
   @ApiProperty(notRequired)
-  @IsNumber()
   @IsOptional()
+  @IsNumber()
   readonly sum?: number
 
   @ApiProperty({ enum: StatusEnum, required: false })
   @IsOptional()
+  @IsString()
   readonly status?: string
 
   @ApiProperty({

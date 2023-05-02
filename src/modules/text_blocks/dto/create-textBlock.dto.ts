@@ -1,5 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { IsString } from 'class-validator'
+import {
+  IsNotEmpty,
+  IsNotEmptyObject,
+  IsOptional,
+  IsString,
+} from 'class-validator'
 import { default_locales, I_Locales } from 'src/schemas/data'
 
 const notRequired = {
@@ -8,13 +13,16 @@ const notRequired = {
 
 export class CreateTextBlockDto {
   @ApiProperty()
+  @IsNotEmpty()
   @IsString()
   name: string
 
   @ApiProperty({ default: default_locales })
+  @IsNotEmptyObject()
   text: I_Locales
 
   @ApiProperty(notRequired)
+  @IsOptional()
   font?: {
     size?: number
     weight?: number
@@ -22,6 +30,7 @@ export class CreateTextBlockDto {
   }
 
   @ApiProperty(notRequired)
+  @IsOptional()
   @IsString()
   url?: string
 }

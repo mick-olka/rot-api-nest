@@ -1,5 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { IsNotEmpty, IsString } from 'class-validator'
+import {
+  IsArray,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+} from 'class-validator'
 import { default_locales, I_Locales, I_ProductFeatures } from 'src/schemas/data'
 import { Product } from 'src/schemas/product.schema'
 import { File } from 'src/utils/interfaces'
@@ -16,28 +22,45 @@ class ProductDto {
 
   @ApiProperty()
   @IsNotEmpty()
+  @IsNumber()
   price: number
 
   @ApiProperty(notRequired)
+  @IsOptional()
+  @IsNumber()
   old_price?: number
 
   @ApiProperty(notRequired)
-  // @IsString()
+  @IsOptional()
+  @IsString()
   url_name?: string
 
+  @IsOptional()
+  @IsArray()
   keywords?: string[]
 
+  @IsOptional()
+  @IsString()
   description?: I_Locales
 
+  @IsOptional()
   features?: I_ProductFeatures
 
+  @IsOptional()
+  @IsArray()
   photos?: string[]
 
+  @IsOptional()
+  @IsArray()
   related_products?: Product[]
 
+  @IsOptional()
+  @IsArray()
   similar_products?: Product[]
 
   @ApiProperty(notRequired)
+  @IsOptional()
+  @IsNumber()
   index?: number
 }
 

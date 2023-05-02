@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { IsString } from 'class-validator'
+import { IsOptional, IsString } from 'class-validator'
 import { default_locales, I_Locales } from 'src/schemas/data'
 
 export class UpdatePhotosDto {
@@ -11,10 +11,12 @@ export class UpdatePhotosDto {
 
 export class UpdatePhotoMultipartDto {
   @ApiProperty({ required: false, default: default_locales })
+  @IsOptional()
   @IsString()
   readonly main_color?: string
 
   @ApiProperty({ required: false, default: default_locales })
+  @IsOptional()
   @IsString()
   readonly pill_color?: string
 
@@ -23,5 +25,6 @@ export class UpdatePhotoMultipartDto {
     format: 'binary',
     required: false,
   })
+  @IsOptional()
   readonly files?: File[]
 }
