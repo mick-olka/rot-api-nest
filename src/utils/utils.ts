@@ -11,11 +11,17 @@ export const getRandomFileName = () => {
   return random_number
 }
 
+function isPrimitive(test) {
+  return test !== Object(test)
+}
+
 export const parseFormDataToJSON = (data: any): any => {
   const res = {}
   Object.entries(data).forEach(([key, value]) => {
-    if (value) res[key] = value
+    if (value) res[key] = JSON.parse(String(value))
+    // if (isPrimitive(res[key]))
   })
+
   return res
 }
 

@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { IsNotEmpty } from 'class-validator'
+import { IsNumber, IsOptional, IsString } from 'class-validator'
 import { default_locales, I_Locales, I_ProductFeatures } from 'src/schemas/data'
 import { Product } from 'src/schemas/product.schema'
 import { File } from 'src/utils/interfaces'
@@ -16,6 +16,7 @@ class ProductDto {
   code?: string
 
   @ApiProperty(notRequired)
+  @IsOptional()
   price?: number
 
   @ApiProperty(notRequired)
@@ -39,7 +40,8 @@ class ProductDto {
 
 export class UpdateProductMultipartDto extends ProductDto {
   @ApiProperty({ default: default_locales, required: false })
-  @IsNotEmpty()
+  @IsOptional()
+  @IsString()
   readonly name?: string
 
   @ApiProperty({ default: default_locales, required: false })

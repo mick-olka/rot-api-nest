@@ -101,7 +101,6 @@ export class ProductsController {
     @UploadedFile() thumbnail: Express.Multer.File,
   ): Promise<ProductI> {
     const product_data: any = parseFormDataToJSON(data)
-    product_data.name = JSON.parse(data.name)
     if (product_data.collections) {
       throw new HttpException(
         'Forbidden field "collections". Use PUT api/collections/ to update collection items',
@@ -132,18 +131,15 @@ export class ProductsController {
     @Body() data: UpdateProductMultipartDto,
     @UploadedFile() thumbnail: Express.Multer.File,
   ): Promise<ProductI> {
-    const product_data: any = parseFormDataToJSON(data)
-    if (product_data.name) product_data.name = JSON.parse(data.name)
-    if (product_data.description)
-      product_data.description = JSON.parse(data.description)
+    const p_dat: any = parseFormDataToJSON(data)
     if (thumbnail) {
       preparePhotos([thumbnail], 640)
-      product_data.thumbnail = thumbnail.filename
+      p_dat.thumbnail = thumbnail.filename
       const prevProd = await this.productsService.findOne(id)
       const prevThumbnail = prevProd.thumbnail
       deleteFile(prevThumbnail)
     }
-    return this.productsService.update(id, product_data)
+    return this.productsService.update(id, p_dat)
   }
 
   @Delete(':id')
