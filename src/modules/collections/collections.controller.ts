@@ -102,7 +102,7 @@ export class CollectionsController {
   @HttpCode(HttpStatus.OK)
   @ApiResponse({
     status: HttpStatus.OK,
-    description: 'Successfully updated collection.',
+    description: 'Successfully updated collection items.',
   })
   @ApiResponse({ status: HttpStatus.FORBIDDEN, description: 'Forbidden.' })
   async updateItems(

@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { IsNumber, IsOptional, IsString } from 'class-validator'
+import { IsArray, IsNumber, IsOptional, IsString } from 'class-validator'
 import { default_locales, I_Locales, I_ProductFeatures } from 'src/schemas/data'
 import { Product } from 'src/schemas/product.schema'
 import { File } from 'src/utils/interfaces'
@@ -59,4 +59,18 @@ export class UpdateProductDto extends ProductDto {
   readonly name?: I_Locales
   readonly description?: I_Locales
   readonly thumbnail?: string
+}
+
+export class UpdateProductRelatedDto {
+  @ApiProperty({ type: [String], default: [] })
+  @IsArray()
+  readonly items?: string[]
+
+  @ApiProperty({ enum: ['add', 'delete'], default: 'add' })
+  @IsString()
+  readonly action: 'add' | 'delete'
+
+  @ApiProperty({ enum: ['similar', 'related'], default: 'related' })
+  @IsString()
+  readonly type: 'similar' | 'related'
 }

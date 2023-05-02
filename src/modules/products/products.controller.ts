@@ -14,6 +14,7 @@ import {
   Query,
   UseGuards,
   HttpException,
+  Put,
 } from '@nestjs/common'
 import {
   ApiBearerAuth,
@@ -23,7 +24,10 @@ import {
   ApiTags,
 } from '@nestjs/swagger'
 import { CreateProductMultipartDto } from './dto/create-product.dto'
-import { UpdateProductMultipartDto } from './dto/update-product.dto'
+import {
+  UpdateProductMultipartDto,
+  UpdateProductRelatedDto,
+} from './dto/update-product.dto'
 import { ProductsService } from './products.service'
 import { Product } from 'src/schemas/product.schema'
 import { preparePhotos, thumbnailInterceptor } from 'src/utils/utils'
@@ -140,6 +144,37 @@ export class ProductsController {
       deleteFile(prevThumbnail)
     }
     return this.productsService.update(id, p_dat)
+  }
+
+  @Put(':id')
+  @UseGuards(AuthGuard('jwt'))
+  @HttpCode(HttpStatus.OK)
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Successfully updated product items.',
+  })
+  @ApiResponse({ status: HttpStatus.FORBIDDEN, description: 'Forbidden.' })
+  async updateItems(
+    @Param('id') id: string,
+    @Body() data: UpdateProductRelatedDto,
+  ) {
+    let update_data = {}
+    if (data.action === 'add')
+      update_data = {
+        $addToSet:
+          data.type === 'similar'
+            ? { similar_products: data.items }
+            : { related_products: data.items },
+      }
+    else {
+      update_data = {
+        $pullAll:
+          data.type === 'similar'
+            ? { similar_products: data.items }
+            : { related_products: data.items },
+      }
+    }
+    return this.productsService.update(id, update_data)
   }
 
   @Delete(':id')
