@@ -5,6 +5,9 @@ import { CreateCollectionDto } from './dto/create-collection.dto'
 import { Collection, CollectionDocument } from '../../schemas/collection.schema'
 import { UpdateCollectionDto } from './dto/update-collection.dto'
 import { getUrlNameFilter } from 'src/utils/utils'
+import { OnEvent } from '@nestjs/event-emitter'
+import { EVENTS } from 'src/utils/constants'
+import { ProductDeletedEvent } from '../products/events/product-deleted.event'
 
 type CollectionI = Collection & { _id: mongoose.Types.ObjectId }
 
@@ -51,5 +54,18 @@ export class CollectionsService {
       getUrlNameFilter(id),
     ).exec()
     return deletedItem
+  }
+
+  @OnEvent(EVENTS.product_deleted)
+  async handleProductDeletedEvent(event: ProductDeletedEvent) {
+    // remove product from collections
+    const p = event.product
+    for (const i in p.collections) {
+      let new_data = {}
+      new_data = {
+        $pullAll: [event.id],
+      }
+      await this.update(p.collections[i], new_data)
+    }
   }
 }

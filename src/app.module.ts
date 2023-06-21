@@ -13,11 +13,13 @@ import { MulterModule } from '@nestjs/platform-express'
 import { ServeStaticModule } from '@nestjs/serve-static'
 import { join } from 'path'
 import { OrdersModule } from './modules/orders/orders.module'
+import { EventEmitterModule } from '@nestjs/event-emitter'
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
     MongooseModule.forRoot(process.env.DATABASE_URL),
+    EventEmitterModule.forRoot(),
     MulterModule.register({
       dest: './upload',
     }),

@@ -8,6 +8,9 @@ import { PaginationQuery, PromisePaginationResT } from 'src/utils/interfaces'
 import { getFilterForSearch, getUrlNameFilter } from 'src/utils/utils'
 import { PhotosService } from '../photos/photos.service'
 import { CollectionsService } from '../collections/collections.service'
+import { EventEmitter2 } from '@nestjs/event-emitter'
+import { ProductDeletedEvent } from './events/product-deleted.event'
+import { EVENTS } from 'src/utils/constants'
 
 type ProductI = Product & { _id: mongoose.Types.ObjectId }
 
@@ -16,8 +19,9 @@ const populateProductsSelector = '_id name url_name thumbnail price old_price'
 @Injectable()
 export class ProductsService {
   constructor(
+    private eventEmitter: EventEmitter2,
     @InjectModel(Product.name)
-    private readonly ProductModel: Model<ProductDocument>, // private readonly photosService: PhotosService,
+    private readonly ProductModel: Model<ProductDocument>,
     @Inject(forwardRef(() => PhotosService))
     private readonly photosService: PhotosService,
     @Inject(forwardRef(() => CollectionsService))
@@ -65,17 +69,10 @@ export class ProductsService {
     const deletedProduct = await this.ProductModel.findOneAndRemove(
       getUrlNameFilter(id),
     )
-    // remove product from collections
-    for (const i in deletedProduct.collections) {
-      let new_data = {}
-      new_data = {
-        $pullAll: [id],
-      }
-      await this.collectionsService.update(
-        deletedProduct.collections[i],
-        new_data,
-      )
-    }
+
+    const productDeletedEvent = new ProductDeletedEvent(id, deletedProduct)
+    this.eventEmitter.emit(EVENTS.product_deleted, productDeletedEvent)
+
     // delete all photos
     for (const i in deletedProduct.photos) {
       await this.photosService.delete(

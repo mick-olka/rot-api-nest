@@ -22,12 +22,12 @@ class ProductDto {
 
   @ApiProperty()
   @IsNotEmpty()
-  @IsNumber()
+  // @IsNumber()
   price: number
 
   @ApiProperty(notRequired)
   @IsOptional()
-  @IsNumber()
+  // @IsNumber()
   old_price?: number
 
   @ApiProperty(notRequired)
@@ -60,7 +60,7 @@ class ProductDto {
 
   @ApiProperty(notRequired)
   @IsOptional()
-  @IsNumber()
+  // @IsNumber()
   index?: number
 }
 
