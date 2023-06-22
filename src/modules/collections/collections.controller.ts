@@ -23,18 +23,14 @@ import { CollectionsService } from './collections.service'
 import { Collection } from 'src/schemas/collection.schema'
 import { AuthGuard } from '@nestjs/passport'
 import { NotFoundInterceptor } from 'src/utils/injectables'
-import { updateSet, transliterate } from 'src/utils/utils'
-import { ProductsService } from '../products/products.service'
+import { transliterate } from 'src/utils/utils'
 
 @ApiBearerAuth()
 @ApiTags('Collections')
 @Controller('collections')
 @UseInterceptors(NotFoundInterceptor)
 export class CollectionsController {
-  constructor(
-    private readonly collectionsService: CollectionsService,
-    private readonly productsService: ProductsService,
-  ) {}
+  constructor(private readonly collectionsService: CollectionsService) {}
 
   @Get()
   @HttpCode(HttpStatus.OK)
@@ -109,19 +105,7 @@ export class CollectionsController {
     @Param('id') id: string,
     @Body() data: UpdateCollectionItemsDto,
   ) {
-    let update_data = {}
-    if (data.action === 'add')
-      update_data = { $addToSet: { items: data.items } }
-    else update_data = { $pullAll: { items: data.items } }
-    // add or remove collection to products
-    for (const i in data.items) {
-      let new_data = {}
-      if (data.action === 'add')
-        new_data = { $addToSet: { collections: data.items } }
-      else new_data = { $pullAll: { collections: data.items } }
-      await this.productsService.update(data.items[i], new_data)
-    }
-    return this.collectionsService.update(id, update_data)
+    return this.collectionsService.updateItems(id, data)
   }
 
   @Delete(':id')

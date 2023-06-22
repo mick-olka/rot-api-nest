@@ -4,4 +4,8 @@ export const constants = {
 
 export enum EVENTS {
   product_deleted = 'product.deleted',
+  photos_deleted = 'photos.deleted',
+  photos_added = 'photos.added',
+  collection_deleted = 'collection.deleted',
+  collection_items_updated = 'collection.items.updated',
 }

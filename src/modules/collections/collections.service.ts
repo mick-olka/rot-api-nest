@@ -3,11 +3,15 @@ import { InjectModel } from '@nestjs/mongoose'
 import mongoose, { Model } from 'mongoose'
 import { CreateCollectionDto } from './dto/create-collection.dto'
 import { Collection, CollectionDocument } from '../../schemas/collection.schema'
-import { UpdateCollectionDto } from './dto/update-collection.dto'
+import {
+  UpdateCollectionDto,
+  UpdateCollectionItemsDto,
+} from './dto/update-collection.dto'
 import { getUrlNameFilter } from 'src/utils/utils'
-import { OnEvent } from '@nestjs/event-emitter'
+import { EventEmitter2, OnEvent } from '@nestjs/event-emitter'
 import { EVENTS } from 'src/utils/constants'
 import { ProductDeletedEvent } from '../products/events/product-deleted.event'
+import { CollectionItemsUpdatedEvent } from './events/collection-items-updated.event'
 
 type CollectionI = Collection & { _id: mongoose.Types.ObjectId }
 
@@ -21,6 +25,7 @@ const getAllCollectionsSelector = '_id name url_name index'
 @Injectable()
 export class CollectionsService {
   constructor(
+    private eventEmitter: EventEmitter2,
     @InjectModel(Collection.name)
     private readonly CollectionModel: Model<CollectionDocument>,
   ) {}
@@ -49,6 +54,30 @@ export class CollectionsService {
     return updatedItem
   }
 
+  async updateItems(
+    id: string,
+    data: UpdateCollectionItemsDto,
+  ): Promise<CollectionI> {
+    let update_data = {}
+    if (data.action === 'add')
+      update_data = { $addToSet: { items: data.items } }
+    else update_data = { $pullAll: { items: data.items } }
+    const updatedItem = await this.CollectionModel.findOneAndUpdate(
+      getUrlNameFilter(id),
+      update_data,
+      { new: true },
+    )
+    const collectionItemsUpdatedEvent = new CollectionItemsUpdatedEvent(
+      id,
+      data,
+    )
+    this.eventEmitter.emit(
+      EVENTS.collection_items_updated,
+      collectionItemsUpdatedEvent,
+    )
+    return updatedItem
+  }
+
   async delete(id: string): Promise<CollectionI> {
     const deletedItem = await this.CollectionModel.findOneAndRemove(
       getUrlNameFilter(id),
@@ -59,13 +88,12 @@ export class CollectionsService {
   @OnEvent(EVENTS.product_deleted)
   async handleProductDeletedEvent(event: ProductDeletedEvent) {
     // remove product from collections
-    const p = event.product
+    const p = event.data
     for (const i in p.collections) {
-      let new_data = {}
-      new_data = {
-        $pullAll: [event.id],
-      }
-      await this.update(p.collections[i], new_data)
+      await this.updateItems(p.collections[i], {
+        items: [event.id],
+        action: 'delete',
+      })
     }
   }
 }

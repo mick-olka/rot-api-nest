@@ -2,10 +2,10 @@ import { Product } from 'src/schemas/product.schema'
 
 export class ProductDeletedEvent {
   id: string
-  product: Product
+  data: Product
 
-  constructor(id: string, product: Product) {
-    this.id = String(id)
-    this.product = product
+  constructor(id: string, data: Product) {
+    this.id = id
+    this.data = data
   }
 }

@@ -1,4 +1,4 @@
-import { Inject, Injectable, forwardRef } from '@nestjs/common'
+import { Injectable } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
 import mongoose, { Model } from 'mongoose'
 import { CreateProductDto } from './dto/create-product.dto'
@@ -6,11 +6,12 @@ import { Product, ProductDocument } from '../../schemas/product.schema'
 import { UpdateProductDto } from './dto/update-product.dto'
 import { PaginationQuery, PromisePaginationResT } from 'src/utils/interfaces'
 import { getFilterForSearch, getUrlNameFilter } from 'src/utils/utils'
-import { PhotosService } from '../photos/photos.service'
-import { CollectionsService } from '../collections/collections.service'
-import { EventEmitter2 } from '@nestjs/event-emitter'
+import { EventEmitter2, OnEvent } from '@nestjs/event-emitter'
 import { ProductDeletedEvent } from './events/product-deleted.event'
 import { EVENTS } from 'src/utils/constants'
+import { PhotosDeletedEvent } from '../photos/events/photos-deleted.event'
+import { PhotosAddedEvent } from '../photos/events/photos-added.event'
+import { CollectionItemsUpdatedEvent } from '../collections/events/collection-items-updated.event'
 
 type ProductI = Product & { _id: mongoose.Types.ObjectId }
 
@@ -22,10 +23,6 @@ export class ProductsService {
     private eventEmitter: EventEmitter2,
     @InjectModel(Product.name)
     private readonly ProductModel: Model<ProductDocument>,
-    @Inject(forwardRef(() => PhotosService))
-    private readonly photosService: PhotosService,
-    @Inject(forwardRef(() => CollectionsService))
-    private readonly collectionsService: CollectionsService,
   ) {}
 
   async findAll({
@@ -73,13 +70,6 @@ export class ProductsService {
     const productDeletedEvent = new ProductDeletedEvent(id, deletedProduct)
     this.eventEmitter.emit(EVENTS.product_deleted, productDeletedEvent)
 
-    // delete all photos
-    for (const i in deletedProduct.photos) {
-      await this.photosService.delete(
-        String(deletedProduct._id),
-        deletedProduct.photos[i],
-      )
-    }
     return deletedProduct
   }
 
@@ -95,5 +85,30 @@ export class ProductsService {
       $pull: { photos: photos_id },
     })
     return updatedProduct
+  }
+
+  @OnEvent(EVENTS.photos_deleted)
+  async handlePhotoDeletedEvent(event: PhotosDeletedEvent) {
+    // remove photo ref in product
+    await this.removePhotos(event.product_id, event.id)
+  }
+
+  @OnEvent(EVENTS.photos_added)
+  async handlePhotoAddedEvent(event: PhotosAddedEvent) {
+    // remove photo ref in product
+    await this.addPhotos(event.product_id, event.id)
+  }
+
+  @OnEvent(EVENTS.collection_items_updated)
+  async handleCollecitonItemsUpdatedEvent(event: CollectionItemsUpdatedEvent) {
+    // // add or remove collection to products
+    const items = event.data.items
+    for (const i in items) {
+      let new_data = {}
+      if (event.data.action === 'add')
+        new_data = { $addToSet: { collections: event.id } }
+      else new_data = { $pullAll: { collections: event.id } }
+      await this.update(items[i], new_data)
+    }
   }
 }

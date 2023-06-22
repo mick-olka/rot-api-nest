@@ -1,5 +1,5 @@
 import mongoose, { Model } from 'mongoose'
-import { Inject, Injectable, forwardRef } from '@nestjs/common'
+import { Injectable } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
 import { CreatePhotosDto } from './dto/create-photos.dto'
 import { UpdatePhotosDto } from './dto/update-photos.dto'
@@ -7,18 +7,21 @@ import {
   Photos as PhotosSchema,
   PhotosDocument,
 } from 'src/schemas/photos.schema'
-import { ProductsService } from '../products/products.service'
 import { deleteFile } from 'src/utils/files'
+import { EventEmitter2, OnEvent } from '@nestjs/event-emitter'
+import { EVENTS } from 'src/utils/constants'
+import { ProductDeletedEvent } from '../products/events/product-deleted.event'
+import { PhotosDeletedEvent } from './events/photos-deleted.event'
+import { PhotosAddedEvent } from './events/photos-added.event'
 
 type PhotosI = PhotosSchema & { _id: mongoose.Types.ObjectId }
 
 @Injectable()
 export class PhotosService {
   constructor(
+    private eventEmitter: EventEmitter2,
     @InjectModel(PhotosSchema.name)
     private readonly PhotosModel: Model<PhotosDocument>,
-    @Inject(forwardRef(() => ProductsService))
-    private readonly productsService: ProductsService,
   ) {}
 
   async findAll(): Promise<PhotosI[]> {
@@ -31,7 +34,12 @@ export class PhotosService {
 
   async create(product_id: string, data: CreatePhotosDto): Promise<PhotosI> {
     const createdItem = await this.PhotosModel.create(data)
-    await this.productsService.addPhotos(product_id, String(createdItem._id))
+    const photosAddedEvent = new PhotosAddedEvent(
+      String(createdItem._id),
+      product_id,
+      createdItem,
+    )
+    this.eventEmitter.emit(EVENTS.photos_added, photosAddedEvent)
     return createdItem
   }
 
@@ -62,7 +70,13 @@ export class PhotosService {
     for (const i in deletedItem.path_arr) {
       deleteFile(deletedItem.path_arr[i])
     }
-    await this.productsService.removePhotos(product_id, id) // remove photos ref in product
+    const photosDeletedEvent = new PhotosDeletedEvent(
+      id,
+      product_id,
+      deletedItem,
+    )
+    this.eventEmitter.emit(EVENTS.photos_deleted, photosDeletedEvent)
+
     return deletedItem
   }
 
@@ -76,5 +90,14 @@ export class PhotosService {
     )
     deleteFile(filename)
     return updated_photos
+  }
+
+  @OnEvent(EVENTS.product_deleted)
+  async handleProductDeletedEvent(event: ProductDeletedEvent) {
+    const p = event.data
+    // delete all photos of the product
+    for (const i in p.photos) {
+      await this.delete(String(event.id), p.photos[i])
+    }
   }
 }
