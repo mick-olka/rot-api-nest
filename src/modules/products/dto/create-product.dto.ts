@@ -36,7 +36,7 @@ class ProductDto {
   url_name?: string
 
   @IsOptional()
-  @IsArray()
+  // @IsArray()
   keywords?: string[]
 
   @IsOptional()

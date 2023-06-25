@@ -31,7 +31,10 @@ export class CollectionsService {
   ) {}
 
   async findAll(): Promise<CollectionI[]> {
-    return this.CollectionModel.find().select(getAllCollectionsSelector).exec()
+    return this.CollectionModel.find()
+      .sort({ index: 'asc' })
+      .select(getAllCollectionsSelector)
+      .exec()
   }
 
   async findOne(id: string): Promise<CollectionI> {

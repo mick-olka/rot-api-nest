@@ -75,7 +75,7 @@ export class ProductsService {
 
   async addPhotos(id: string, photos_id: string): Promise<ProductI> {
     const updatedProduct = await this.ProductModel.findByIdAndUpdate(id, {
-      $addToSet: { photos: photos_id },
+      $addToSet: { photos: [photos_id] },
     })
     return updatedProduct
   }
@@ -100,14 +100,14 @@ export class ProductsService {
   }
 
   @OnEvent(EVENTS.collection_items_updated)
-  async handleCollecitonItemsUpdatedEvent(event: CollectionItemsUpdatedEvent) {
-    // // add or remove collection to products
+  async handleCollectionItemsUpdatedEvent(event: CollectionItemsUpdatedEvent) {
+    // add or remove collection to products
     const items = event.data.items
     for (const i in items) {
       let new_data = {}
       if (event.data.action === 'add')
-        new_data = { $addToSet: { collections: event.id } }
-      else new_data = { $pullAll: { collections: event.id } }
+        new_data = { $addToSet: { collections: [event.id] } }
+      else new_data = { $pullAll: { collections: [event.id] } }
       await this.update(items[i], new_data)
     }
   }

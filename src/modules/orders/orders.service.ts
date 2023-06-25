@@ -69,4 +69,9 @@ export class OrdersService {
     }).exec()
     return deletedItem
   }
+
+  // @OnEvent(EVENTS.product_deleted)
+  // async handleProductDeletedEvent(event: ProductDeletedEvent) {
+  //   //
+  // }
 }

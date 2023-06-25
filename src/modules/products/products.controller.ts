@@ -104,8 +104,8 @@ export class ProductsController {
     @Body() data: CreateProductMultipartDto,
     @UploadedFile() thumbnail: Express.Multer.File,
   ): Promise<ProductI> {
-    console.log(data)
     const product_data: any = parseFormDataToJSON(data)
+    console.log(product_data)
     if (product_data.collections) {
       throw new HttpException(
         'Forbidden field "collections". Use PUT api/collections/ to update collection items',
