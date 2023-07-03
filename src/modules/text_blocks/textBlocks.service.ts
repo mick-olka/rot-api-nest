@@ -18,8 +18,12 @@ export class TextBlocksService {
     return this.TextBlockModel.find().exec()
   }
 
-  async findOne(id: string): Promise<TextBlockI> {
-    return this.TextBlockModel.findOne({ _id: id }).exec()
+  async findOne(query: string): Promise<TextBlockI> {
+    const filter: { _id?: string; name?: object | string } = {}
+    if (mongoose.isValidObjectId(query)) {
+      filter._id = query
+    } else filter.name = { $regex: query }
+    return this.TextBlockModel.findOne(filter).exec()
   }
 
   async create(data: CreateTextBlockDto): Promise<TextBlockI> {
