@@ -18,6 +18,7 @@ type CollectionI = Collection & { _id: mongoose.Types.ObjectId }
 const populateProducts = {
   path: 'items',
   select: '_id name url_name price old_price thumbnail index',
+  options: { sort: { index: 'asc' } },
 }
 
 const getAllCollectionsSelector = '_id name url_name index'
