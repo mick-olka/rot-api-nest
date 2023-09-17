@@ -4,6 +4,7 @@
 
 # runtime files
 /upload
+.env
 
 # Logs
 logs
