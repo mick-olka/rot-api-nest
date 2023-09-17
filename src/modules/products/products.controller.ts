@@ -15,6 +15,7 @@ import {
   UseGuards,
   HttpException,
   Put,
+  Header,
 } from '@nestjs/common'
 import {
   ApiBearerAuth,
@@ -195,4 +196,15 @@ export class ProductsController {
     }
     return this.productsService.delete(id)
   }
+
+  // @Get('rename/all')
+  // @HttpCode(HttpStatus.OK)
+  // // @Header('content-type', 'application/json')
+  // @ApiResponse({
+  //   status: HttpStatus.OK,
+  //   description: 'Successfully transferred product.',
+  // })
+  // transferAllProducts(): Promise<object> {
+  //   return this.productsService.renamePhotos()
+  // }
 }

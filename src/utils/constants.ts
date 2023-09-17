@@ -8,4 +8,5 @@ export enum EVENTS {
   photos_added = 'photos.added',
   collection_deleted = 'collection.deleted',
   collection_items_updated = 'collection.items.updated',
+  product_import = 'product.import',
 }

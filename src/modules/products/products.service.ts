@@ -7,15 +7,21 @@ import { UpdateProductDto } from './dto/update-product.dto'
 import { PaginationQuery, PromisePaginationResT } from 'src/utils/interfaces'
 import { getFilterForSearch, getUrlNameFilter } from 'src/utils/utils'
 import { EventEmitter2, OnEvent } from '@nestjs/event-emitter'
-import { ProductDeletedEvent } from './events/product-deleted.event'
+import {
+  ProductDeletedEvent,
+  ProductImportedEvent,
+} from './events/product-deleted.event'
 import { EVENTS } from 'src/utils/constants'
 import { PhotosDeletedEvent } from '../photos/events/photos-deleted.event'
 import { PhotosAddedEvent } from '../photos/events/photos-added.event'
 import { CollectionItemsUpdatedEvent } from '../collections/events/collection-items-updated.event'
+import { getProductsJSON, transferOneProduct } from 'src/utils/transfer'
+import { getAllFiles } from 'src/utils/files'
 
 type ProductI = Product & { _id: mongoose.Types.ObjectId }
 
-const populateProductsSelector = '_id name url_name thumbnail price old_price'
+const populateProductsSelector =
+  '_id name url_name thumbnail price old_price index'
 
 @Injectable()
 export class ProductsService {
@@ -80,6 +86,42 @@ export class ProductsService {
     return updatedProduct
   }
 
+  async transferOneProduct(index?: number): Promise<Product> {
+    const json = await getProductsJSON()
+    const data = transferOneProduct(json[index])
+    const new_pr = await this.ProductModel.create(data.product)
+    const productImportEvent = new ProductImportedEvent(new_pr.id, data.photos)
+    this.eventEmitter.emit(EVENTS.product_import, productImportEvent)
+    return new_pr
+  }
+
+  async transferAllProducts(): Promise<number> {
+    const json = await getProductsJSON()
+    let counter = 0
+    for (const i in json) {
+      try {
+        const data = transferOneProduct(json[i])
+        const new_pr = await this.ProductModel.create(data.product)
+        const productImportEvent = new ProductImportedEvent(
+          new_pr.id,
+          data.photos,
+        )
+        this.eventEmitter.emit(EVENTS.product_import, productImportEvent)
+        counter++
+      } catch (e) {
+        console.log(`E: ${json[i]._id}`)
+        console.log(e)
+      }
+    }
+    return counter
+  }
+
+  async renamePhotos(): Promise<object> {
+    const files = getAllFiles()
+    const with_space = files.filter((f) => f.includes(' '))
+    return with_space
+  }
+
   async removePhotos(id: string, photos_id: string): Promise<ProductI> {
     const updatedProduct = await this.ProductModel.findByIdAndUpdate(id, {
       $pull: { photos: photos_id },
@@ -95,7 +137,7 @@ export class ProductsService {
 
   @OnEvent(EVENTS.photos_added)
   async handlePhotoAddedEvent(event: PhotosAddedEvent) {
-    // remove photo ref in product
+    // add photo ref in product
     await this.addPhotos(event.product_id, event.id)
   }
 

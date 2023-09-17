@@ -18,7 +18,7 @@ export enum E_Languages {
   de = 'de',
 }
 
-const lanEnumToObject = <T>(value: T): { [key in E_Languages]: T } => {
+export const lanEnumToObject = <T>(value: T): { [key in E_Languages]: T } => {
   return {
     en: value,
     ua: value,
@@ -39,12 +39,10 @@ export const locales = raw(lanEnumToObject({ type: String, default: '' }))
 export const default_features = lanEnumToObject([])
 
 export type I_ProductFeatures = {
-  [key in E_Languages]: [
-    {
-      key: string
-      value: string
-    },
-  ]
+  [key in E_Languages]: {
+    key: string
+    value: string
+  }[]
 }
 
 export const productFeatures = raw(

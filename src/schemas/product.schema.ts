@@ -1,5 +1,4 @@
 import { Photos } from './photos.schema'
-import { Collection } from './collection.schema'
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
 import { HydratedDocument } from 'mongoose'
 import {
@@ -22,7 +21,7 @@ export class Product {
   @Prop({ unique: true })
   url_name: string
 
-  @Prop({ unique: true })
+  @Prop({ unique: false })
   code: string
 
   @Prop(Number)

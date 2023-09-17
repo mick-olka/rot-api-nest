@@ -4,6 +4,7 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger'
 import * as bodyParser from 'body-parser'
 import { AppModule } from './app.module'
 import { constants } from './utils/constants'
+import { performTransfer } from './utils/transfer'
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule)
@@ -29,6 +30,7 @@ async function bootstrap() {
   await app.listen(4000, () => {
     console.log('DOCS: http://localhost:4000/api-docs')
     constants.ADMIN_KEY = process.env.ADMIN_KEY
+    performTransfer()
   })
 }
 bootstrap()

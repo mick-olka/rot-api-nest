@@ -10,7 +10,10 @@ import {
 import { deleteFile } from 'src/utils/files'
 import { EventEmitter2, OnEvent } from '@nestjs/event-emitter'
 import { EVENTS } from 'src/utils/constants'
-import { ProductDeletedEvent } from '../products/events/product-deleted.event'
+import {
+  ProductDeletedEvent,
+  ProductImportedEvent,
+} from '../products/events/product-deleted.event'
 import { PhotosDeletedEvent } from './events/photos-deleted.event'
 import { PhotosAddedEvent } from './events/photos-added.event'
 
@@ -98,6 +101,15 @@ export class PhotosService {
     // delete all photos of the product
     for (const i in p.photos) {
       await this.delete(String(event.id), p.photos[i])
+    }
+  }
+
+  @OnEvent(EVENTS.product_import)
+  async handleProductImportedEvent(event: ProductImportedEvent) {
+    const p = event.data
+    // create photos when product is imported
+    for (const i in p) {
+      await this.create(String(event.id), p[i])
     }
   }
 }
