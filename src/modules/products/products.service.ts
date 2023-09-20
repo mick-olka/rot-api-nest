@@ -33,7 +33,7 @@ export class ProductsService {
 
   async findAll({
     page = '1',
-    limit = '20',
+    limit = '99',
     regex,
   }: PaginationQuery): PromisePaginationResT<ProductI> {
     const p = Number(page),
@@ -41,7 +41,8 @@ export class ProductsService {
     const filter = getFilterForSearch(regex, ['code', 'name.ua', 'name.en'])
     const count = await this.ProductModel.count(filter)
     const items = await this.ProductModel.find(filter)
-      .sort({ index: 'asc' })
+      .select(populateProductsSelector)
+      .sort({ index: 'asc', name: 'asc' })
       .skip((p - 1) * l)
       .limit(l)
     return { count, docs: items }
