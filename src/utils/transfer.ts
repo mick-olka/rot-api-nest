@@ -91,6 +91,7 @@ export const transferOneProduct = (
     similar_products: [],
     thumbnail: old.thumbnail,
     url_name: old.url_name,
+    active: true,
   }
   const photos: Photos[] = old.images.map((p) => ({
     path_arr: p.pathArr.map((p) => p.split('/').pop()),

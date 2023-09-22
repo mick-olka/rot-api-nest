@@ -58,6 +58,9 @@ export class Product {
 
   @Prop({ default: 0, required: false })
   index: number
+
+  @Prop({ default: true, required: true })
+  active: boolean
 }
 
 export const ProductSchema = SchemaFactory.createForClass(Product)

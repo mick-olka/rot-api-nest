@@ -73,12 +73,19 @@ export class ProductsController {
     description: 'Products search',
     required: false,
   })
+  @ApiQuery({
+    name: 'all',
+    type: String,
+    description: 'Show hidden',
+    required: false,
+  })
   async findAll(
     @Query('page') page: string,
     @Query('limit') limit: string,
     @Query('regex') regex: string,
+    @Query('all') all: string,
   ): PromisePaginationResT<ProductI> {
-    return this.productsService.findAll({ page, limit, regex })
+    return this.productsService.findAll({ page, limit, regex, all })
   }
 
   @Get(':id')
@@ -106,7 +113,6 @@ export class ProductsController {
     @UploadedFile() thumbnail: Express.Multer.File,
   ): Promise<ProductI> {
     const product_data: any = parseFormDataToJSON(data)
-    console.log(product_data)
     if (product_data.collections) {
       throw new HttpException(
         'Forbidden field "collections". Use PUT api/collections/ to update collection items',

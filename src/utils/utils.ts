@@ -76,6 +76,7 @@ export const preparePhotos = (
 export const getFilterForSearch = (
   search_string: string | undefined,
   fields: string[],
+  all?: string,
 ): any => {
   let filter: any = {}
   if (search_string) {
@@ -84,6 +85,7 @@ export const getFilterForSearch = (
     const regex_fields = fields.map((f) => ({ [f]: { $regex: regex } }))
     filter = { $or: regex_fields }
   }
+  if (!all) filter.active = { $ne: false }
   return filter
 }
 

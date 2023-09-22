@@ -12,8 +12,9 @@ import {
   UseInterceptors,
   Put,
   HttpException,
+  Query,
 } from '@nestjs/common'
-import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger'
+import { ApiBearerAuth, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { CreateCollectionDto } from './dto/create-collection.dto'
 import {
   UpdateCollectionDto,
@@ -44,13 +45,22 @@ export class CollectionsController {
 
   @Get(':id')
   @HttpCode(HttpStatus.OK)
+  @ApiQuery({
+    name: 'all',
+    type: String,
+    description: 'Show hidden',
+    required: false,
+  })
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Successfully fetched collection.',
   })
   //   @ApiResponse({ status: HttpStatus.FORBIDDEN, description: 'Forbidden.' })
-  getTodoById(@Param('id') id: string): Promise<Collection> {
-    return this.collectionsService.findOne(id)
+  getTodoById(
+    @Param('id') id: string,
+    @Query('all') all: string,
+  ): Promise<Collection> {
+    return this.collectionsService.findOne(id, all)
   }
 
   @Post()

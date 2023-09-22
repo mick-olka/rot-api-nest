@@ -21,7 +21,7 @@ import { getAllFiles } from 'src/utils/files'
 type ProductI = Product & { _id: mongoose.Types.ObjectId }
 
 const populateProductsSelector =
-  '_id name url_name thumbnail price old_price index'
+  '_id name url_name thumbnail price old_price index active'
 
 @Injectable()
 export class ProductsService {
@@ -35,10 +35,15 @@ export class ProductsService {
     page = '1',
     limit = '99',
     regex,
+    all,
   }: PaginationQuery): PromisePaginationResT<ProductI> {
     const p = Number(page),
       l = Number(limit)
-    const filter = getFilterForSearch(regex, ['code', 'name.ua', 'name.en'])
+    const filter = getFilterForSearch(
+      regex,
+      ['code', 'name.ua', 'name.en'],
+      all,
+    )
     const count = await this.ProductModel.count(filter)
     const items = await this.ProductModel.find(filter)
       .select(populateProductsSelector)

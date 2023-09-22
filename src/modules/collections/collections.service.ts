@@ -17,8 +17,9 @@ type CollectionI = Collection & { _id: mongoose.Types.ObjectId }
 
 const populateProducts = {
   path: 'items',
-  select: '_id name url_name price old_price thumbnail index',
+  select: '_id name url_name price old_price thumbnail index active',
   options: { sort: { index: 'asc' } },
+  match: {},
 }
 
 const getAllCollectionsSelector = '_id name url_name index'
@@ -38,9 +39,12 @@ export class CollectionsService {
       .exec()
   }
 
-  async findOne(id: string): Promise<CollectionI> {
+  async findOne(id: string, all?: string): Promise<CollectionI> {
+    // match: { active: { $ne: false } },
+    const pop = { ...populateProducts }
+    if (!all) pop.match = { active: { $ne: false } }
     return this.CollectionModel.findOne(getUrlNameFilter(id))
-      .populate(populateProducts)
+      .populate(pop)
       .exec()
   }
 

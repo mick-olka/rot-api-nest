@@ -25,6 +25,11 @@ export class PaginationQuery {
     required: false,
   })
   regex?: string
+
+  @ApiProperty({
+    required: false,
+  })
+  all?: string
 }
 
 export interface I_PaginationRes<T> {
