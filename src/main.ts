@@ -28,7 +28,7 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config)
   SwaggerModule.setup('api-docs', app, document)
   await app.listen(7500, () => {
-    console.log('DOCS: http://localhost:4000/api-docs')
+    console.log('DOCS: http://localhost:7500/api-docs')
     constants.ADMIN_KEY = process.env.ADMIN_KEY
     performTransfer()
   })
